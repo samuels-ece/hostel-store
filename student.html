@@ -10,7 +10,6 @@
 
 <title>Hostel Store | Student</title>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -30,8 +29,6 @@ body {
     color: #172033;
 }
 
-/* HEADER */
-
 .header {
     background: white;
     border-bottom: 1px solid #ddd;
@@ -40,6 +37,10 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .logo {
@@ -51,19 +52,27 @@ body {
     color: #2563eb;
 }
 
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cart-button,
 .logout {
     background: white;
     border: 1px solid #ccc;
     border-radius: 8px;
-
-    padding: 9px 15px;
-
+    padding: 9px 13px;
     cursor: pointer;
-
     font-weight: bold;
 }
 
-/* MAIN */
+.cart-button {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
 
 .container {
     max-width: 1100px;
@@ -79,8 +88,6 @@ h1 {
     color: #667085;
     margin-top: 0;
 }
-
-/* MESSAGE */
 
 #message {
     display: none;
@@ -103,37 +110,25 @@ h1 {
     color: #991b1b;
 }
 
-/* PRODUCTS */
-
 .products {
     display: grid;
-
     grid-template-columns:
         repeat(auto-fill, minmax(230px, 1fr));
-
     gap: 18px;
-
     margin-top: 25px;
 }
 
 .product {
     background: white;
-
     border: 1px solid #ddd;
-
     border-radius: 14px;
-
     padding: 18px;
-
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
 .product-icon {
     width: 60px;
     height: 60px;
-
     background: #eff6ff;
-
     border-radius: 14px;
 
     display: flex;
@@ -141,7 +136,6 @@ h1 {
     justify-content: center;
 
     font-size: 32px;
-
     margin-bottom: 12px;
 }
 
@@ -153,57 +147,140 @@ h1 {
 .product-category {
     color: #667085;
     font-size: 13px;
-
     margin-top: 4px;
 }
 
 .price {
     font-size: 18px;
     font-weight: bold;
-
     margin-top: 15px;
 }
 
 .stock {
     margin-top: 8px;
-
     font-size: 13px;
-
     font-weight: bold;
-}
-
-.available {
     color: #16a34a;
 }
 
-.soldout {
+.quantity {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.quantity button {
+    width: 40px;
+    height: 38px;
+    border: none;
+    background: #f1f5f9;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.quantity span {
+    font-weight: bold;
+}
+
+.add-cart {
+    width: 100%;
+    margin-top: 10px;
+    padding: 11px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #2563eb;
+    color: white;
+
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.cart-section {
+    display: none;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 25px;
+}
+
+.cart-section.show {
+    display: block;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-item-name {
+    font-weight: bold;
+}
+
+.cart-item-details {
+    color: #667085;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.remove {
+    border: none;
+    background: #fee2e2;
     color: #dc2626;
+    border-radius: 7px;
+    padding: 7px 10px;
+    cursor: pointer;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 18px;
+
+    font-size: 19px;
+    font-weight: bold;
 }
 
 .empty {
     background: white;
-
     padding: 40px;
-
     text-align: center;
-
     border: 1px dashed #bbb;
-
     border-radius: 12px;
-
     color: #667085;
 }
 
 .loading {
     text-align: center;
-
     padding: 40px;
-
     color: #667085;
 }
 
+.checkout-button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 13px;
 
-/* MOBILE */
+    border: none;
+    border-radius: 9px;
+
+    background: #16a34a;
+    color: white;
+
+    font-weight: bold;
+    cursor: pointer;
+}
 
 @media(max-width:600px) {
 
@@ -213,6 +290,16 @@ h1 {
 
     .products {
         grid-template-columns: 1fr;
+    }
+
+    .logo {
+        font-size: 17px;
+    }
+
+    .cart-button,
+    .logout {
+        padding: 8px 9px;
+        font-size: 12px;
     }
 
 }
@@ -225,8 +312,6 @@ h1 {
 <body>
 
 
-<!-- HEADER -->
-
 <div class="header">
 
     <div class="logo">
@@ -236,18 +321,29 @@ h1 {
     </div>
 
 
-    <button
-        id="logoutButton"
-        class="logout">
+    <div class="header-right">
 
-        Logout
+        <button
+            id="cartButton"
+            class="cart-button">
 
-    </button>
+            🛒 Cart (<span id="cartCount">0</span>)
+
+        </button>
+
+
+        <button
+            id="logoutButton"
+            class="logout">
+
+            Logout
+
+        </button>
+
+    </div>
 
 </div>
 
-
-<!-- MAIN -->
 
 <div class="container">
 
@@ -255,22 +351,56 @@ h1 {
 <h1>Student Store</h1>
 
 <p class="subtitle">
-Available products in the hostel store.
+Choose products and add them to your cart.
 </p>
 
 
 <div id="message"></div>
 
 
+<!-- PRODUCTS -->
+
 <div
     id="productsContainer"
     class="products">
 
     <div class="loading">
-
         Loading products...
+    </div>
+
+</div>
+
+
+<!-- CART -->
+
+<div
+    id="cartSection"
+    class="cart-section">
+
+    <h2>🛒 Your Cart</h2>
+
+
+    <div id="cartItems"></div>
+
+
+    <div class="cart-total">
+
+        <span>Total</span>
+
+        <span id="cartTotal">
+            ₹0.00
+        </span>
 
     </div>
+
+
+    <button
+        id="checkoutButton"
+        class="checkout-button">
+
+        PLACE ORDER
+
+    </button>
 
 </div>
 
@@ -279,6 +409,14 @@ Available products in the hostel store.
 
 
 <script>
+
+/* ==========================================
+   VARIABLES
+========================================== */
+
+let cart = [];
+
+let products = {};
 
 
 /* ==========================================
@@ -294,6 +432,14 @@ function showMessage(text, type) {
 
     message.className = type;
 
+    setTimeout(function() {
+
+        message.className = "";
+
+        message.textContent = "";
+
+    }, 3000);
+
 }
 
 
@@ -303,7 +449,10 @@ function showMessage(text, type) {
 
 auth.onAuthStateChanged(function(user) {
 
-    console.log("Student auth state:", user);
+    console.log(
+        "Student auth state:",
+        user
+    );
 
 
     if (!user) {
@@ -313,12 +462,6 @@ auth.onAuthStateChanged(function(user) {
         return;
 
     }
-
-
-    console.log(
-        "Student logged in:",
-        user.uid
-    );
 
 
     loadProducts();
@@ -332,37 +475,33 @@ auth.onAuthStateChanged(function(user) {
 
 document
     .getElementById("logoutButton")
-    .addEventListener("click", async function() {
+    .addEventListener(
+        "click",
+        async function() {
 
-        try {
+            try {
 
-            console.log("Logging out...");
+                await auth.signOut();
 
-            await auth.signOut();
+                window.location.replace(
+                    "index.html"
+                );
 
-            console.log("Logout successful");
+            }
 
-            window.location.replace("index.html");
+            catch (error) {
 
-        }
+                console.error(error);
 
-        catch (error) {
+                alert(
+                    "Logout failed:\n\n" +
+                    error.message
+                );
 
-            console.error(
-                "Logout error:",
-                error
-            );
-
-            alert(
-                "Logout failed:\n\n" +
-                error.code +
-                "\n\n" +
-                error.message
-            );
+            }
 
         }
-
-    });
+    );
 
 
 /* ==========================================
@@ -371,20 +510,11 @@ document
 
 function loadProducts() {
 
-    console.log("Loading products...");
-
-
     db
         .collection("products")
         .onSnapshot(
 
             function(snapshot) {
-
-                console.log(
-                    "Products found:",
-                    snapshot.size
-                );
-
 
                 const container =
                     document.getElementById(
@@ -393,6 +523,8 @@ function loadProducts() {
 
 
                 container.innerHTML = "";
+
+                products = {};
 
 
                 let count = 0;
@@ -404,33 +536,44 @@ function loadProducts() {
                         doc.data();
 
 
-                    console.log(
-                        "Product:",
-                        doc.id,
-                        product
-                    );
-
-
                     const stock =
                         Number(
                             product.stock || 0
                         );
 
 
-                    /*
-                       Show only products that
-                       have stock available.
-                    */
-
                     if (
                         product.available === true &&
                         stock > 0
                     ) {
 
+                        products[doc.id] = {
+
+                            id: doc.id,
+
+                            name:
+                                product.name || "Product",
+
+                            category:
+                                product.category || "General",
+
+                            price:
+                                Number(
+                                    product.price || 0
+                                ),
+
+                            stock: stock,
+
+                            icon:
+                                product.icon || "🛍️"
+
+                        };
+
+
                         createProduct(
-                            doc.id,
-                            product
+                            products[doc.id]
                         );
+
 
                         count++;
 
@@ -448,10 +591,6 @@ function loadProducts() {
                             No products are
                             currently available.
 
-                            <br><br>
-
-                            Please check again later.
-
                         </div>
 
                     `;
@@ -460,14 +599,9 @@ function loadProducts() {
 
             },
 
-
             function(error) {
 
-                console.error(
-                    "Product loading error:",
-                    error
-                );
-
+                console.error(error);
 
                 showMessage(
                     "Unable to load products: " +
@@ -486,7 +620,7 @@ function loadProducts() {
    CREATE PRODUCT
 ========================================== */
 
-function createProduct(id, product) {
+function createProduct(product) {
 
     const container =
         document.getElementById(
@@ -501,55 +635,86 @@ function createProduct(id, product) {
     card.className = "product";
 
 
-    const stock =
-        Number(
-            product.stock || 0
-        );
-
-
     card.innerHTML = `
 
         <div class="product-icon">
 
-            ${escapeHTML(
-                product.icon || "🛍️"
-            )}
+            ${escapeHTML(product.icon)}
 
         </div>
 
 
         <div class="product-name">
 
-            ${escapeHTML(
-                product.name || "Product"
-            )}
+            ${escapeHTML(product.name)}
 
         </div>
 
 
         <div class="product-category">
 
-            ${escapeHTML(
-                product.category || "General"
-            )}
+            ${escapeHTML(product.category)}
 
         </div>
 
 
         <div class="price">
 
-            ₹${Number(
-                product.price || 0
-            ).toFixed(2)}
+            ₹${product.price.toFixed(2)}
 
         </div>
 
 
-        <div class="stock available">
+        <div class="stock">
 
-            🟢 ${stock} available
+            🟢 ${product.stock} available
 
         </div>
+
+
+        <div class="quantity">
+
+            <button
+                onclick="changeQuantity(
+                    '${product.id}',
+                    -1
+                )">
+
+                −
+
+            </button>
+
+
+            <span
+                id="qty-${product.id}">
+
+                1
+
+            </span>
+
+
+            <button
+                onclick="changeQuantity(
+                    '${product.id}',
+                    1
+                )">
+
+                +
+
+            </button>
+
+        </div>
+
+
+        <button
+            class="add-cart"
+            onclick="addToCart(
+                '${product.id}'
+            )">
+
+            🛒 ADD TO CART
+
+        </button>
 
     `;
 
@@ -560,6 +725,338 @@ function createProduct(id, product) {
 
 
 /* ==========================================
+   CHANGE QUANTITY
+========================================== */
+
+function changeQuantity(
+    productId,
+    amount
+) {
+
+    const product =
+        products[productId];
+
+
+    if (!product) return;
+
+
+    const element =
+        document.getElementById(
+            "qty-" + productId
+        );
+
+
+    let quantity =
+        Number(element.textContent);
+
+
+    quantity += amount;
+
+
+    if (quantity < 1) {
+
+        quantity = 1;
+
+    }
+
+
+    if (quantity > product.stock) {
+
+        quantity = product.stock;
+
+    }
+
+
+    element.textContent =
+        quantity;
+
+}
+
+
+/* ==========================================
+   ADD TO CART
+========================================== */
+
+function addToCart(productId) {
+
+    const product =
+        products[productId];
+
+
+    if (!product) {
+
+        return;
+
+    }
+
+
+    const quantity =
+        Number(
+            document
+                .getElementById(
+                    "qty-" + productId
+                )
+                .textContent
+        );
+
+
+    const existing =
+        cart.find(function(item) {
+
+            return item.id === productId;
+
+        });
+
+
+    if (existing) {
+
+        existing.quantity += quantity;
+
+
+        if (
+            existing.quantity >
+            product.stock
+        ) {
+
+            existing.quantity =
+                product.stock;
+
+        }
+
+    }
+
+    else {
+
+        cart.push({
+
+            id: product.id,
+
+            name: product.name,
+
+            price: product.price,
+
+            icon: product.icon,
+
+            quantity: quantity
+
+        });
+
+    }
+
+
+    updateCart();
+
+
+    showMessage(
+        "✅ Added to cart!",
+        "success"
+    );
+
+}
+
+
+/* ==========================================
+   UPDATE CART
+========================================== */
+
+function updateCart() {
+
+    const container =
+        document.getElementById(
+            "cartItems"
+        );
+
+
+    container.innerHTML = "";
+
+
+    let total = 0;
+
+    let count = 0;
+
+
+    if (cart.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                Your cart is empty.
+
+            </div>
+
+        `;
+
+    }
+
+
+    cart.forEach(function(item, index) {
+
+        const itemTotal =
+            item.price *
+            item.quantity;
+
+
+        total += itemTotal;
+
+        count += item.quantity;
+
+
+        const div =
+            document.createElement("div");
+
+
+        div.className =
+            "cart-item";
+
+
+        div.innerHTML = `
+
+            <div>
+
+                <div class="cart-item-name">
+
+                    ${escapeHTML(
+                        item.icon
+                    )}
+
+                    ${escapeHTML(
+                        item.name
+                    )}
+
+                </div>
+
+
+                <div class="cart-item-details">
+
+                    ₹${item.price.toFixed(2)}
+                    ×
+                    ${item.quantity}
+
+                    =
+                    ₹${itemTotal.toFixed(2)}
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="remove"
+                onclick="removeFromCart(${index})">
+
+                Remove
+
+            </button>
+
+        `;
+
+
+        container.appendChild(div);
+
+    });
+
+
+    document.getElementById(
+        "cartCount"
+    ).textContent = count;
+
+
+    document.getElementById(
+        "cartTotal"
+    ).textContent =
+        "₹" + total.toFixed(2);
+
+}
+
+
+/* ==========================================
+   REMOVE FROM CART
+========================================== */
+
+function removeFromCart(index) {
+
+    cart.splice(index, 1);
+
+    updateCart();
+
+}
+
+
+/* ==========================================
+   CART BUTTON
+========================================== */
+
+document
+    .getElementById("cartButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            const cartSection =
+                document.getElementById(
+                    "cartSection"
+                );
+
+
+            cartSection.classList.toggle(
+                "show"
+            );
+
+
+            if (
+                cartSection.classList.contains(
+                    "show"
+                )
+            ) {
+
+                cartSection.scrollIntoView({
+                    behavior: "smooth"
+                });
+
+            }
+
+        }
+    );
+
+
+/* ==========================================
+   PLACE ORDER
+========================================== */
+
+document
+    .getElementById("checkoutButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            if (cart.length === 0) {
+
+                alert(
+                    "Your cart is empty."
+                );
+
+                return;
+
+            }
+
+
+            /*
+               ORDER SYSTEM WILL BE
+               CONNECTED TO FIRESTORE
+               IN THE NEXT STEP.
+            */
+
+            alert(
+                "Cart is ready!\n\n" +
+                "Order placement will be added next."
+            );
+
+        }
+    );
+
+
+/* ==========================================
    ESCAPE HTML
 ========================================== */
 
@@ -567,20 +1064,41 @@ function escapeHTML(value) {
 
     return String(value)
 
-        .replace(/&/g, "&amp;")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
 
-        .replace(/</g, "&lt;")
+        .replace(
+            /</g,
+            "&lt;"
+        )
 
-        .replace(/>/g, "&gt;")
+        .replace(
+            />/g,
+            "&gt;"
+        )
 
-        .replace(/"/g, "&quot;")
+        .replace(
+            /"/g,
+            "&quot;"
+        )
 
-        .replace(/'/g, "&#039;");
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
-</script>
 
+/* ==========================================
+   INITIAL CART
+========================================== */
+
+updateCart();
+
+</script>
 
 </body>
 
