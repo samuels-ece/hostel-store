@@ -332,14 +332,25 @@ h1 {
         </button>
 
 
-        <button
-            id="logoutButton"
-            class="logout">
+        <div style="display:flex; gap:8px; align-items:center;">
 
-            Logout
+    <button
+        class="logout-button"
+        onclick="openMyOrders()">
 
-        </button>
+        📦 My Orders
 
+    </button>
+
+    <button
+        class="logout-button"
+        id="logoutButton">
+
+        Logout
+
+    </button>
+
+        </div>
     </div>
 
 </div>
@@ -1234,7 +1245,11 @@ function escapeHTML(value) {
 ========================================== */
 
 updateCart();
+function openMyOrders() {
 
+    window.location.href = "my-orders.html";
+
+}
 </script>
 
 </body>
