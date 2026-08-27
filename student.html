@@ -1020,6 +1020,7 @@ document
     );
 
 
+
 /* ==========================================
    PLACE ORDER
 ========================================== */
@@ -1028,7 +1029,7 @@ document
     .getElementById("checkoutButton")
     .addEventListener(
         "click",
-        function() {
+        async function() {
 
             if (cart.length === 0) {
 
@@ -1041,16 +1042,153 @@ document
             }
 
 
-            /*
-               ORDER SYSTEM WILL BE
-               CONNECTED TO FIRESTORE
-               IN THE NEXT STEP.
-            */
+            const user =
+                auth.currentUser;
 
-            alert(
-                "Cart is ready!\n\n" +
-                "Order placement will be added next."
-            );
+
+            if (!user) {
+
+                alert(
+                    "Please login again."
+                );
+
+                window.location.replace(
+                    "index.html"
+                );
+
+                return;
+
+            }
+
+
+            const button =
+                document.getElementById(
+                    "checkoutButton"
+                );
+
+
+            button.disabled = true;
+
+            button.textContent =
+                "PLACING ORDER...";
+
+
+            try {
+
+                let total = 0;
+
+
+                cart.forEach(function(item) {
+
+                    total +=
+                        item.price *
+                        item.quantity;
+
+                });
+
+
+                const orderItems =
+                    cart.map(function(item) {
+
+                        return {
+
+                            productId:
+                                item.id,
+
+                            name:
+                                item.name,
+
+                            price:
+                                item.price,
+
+                            quantity:
+                                item.quantity,
+
+                            subtotal:
+                                item.price *
+                                item.quantity
+
+                        };
+
+                    });
+
+
+                await db
+                    .collection("orders")
+                    .add({
+
+                        studentId:
+                            user.uid,
+
+                        studentEmail:
+                            user.email || "",
+
+                        items:
+                            orderItems,
+
+                        total:
+                            total,
+
+                        status:
+                            "pending",
+
+                        createdAt:
+                            firebase.firestore
+                                .FieldValue
+                                .serverTimestamp()
+
+                    });
+
+
+                cart = [];
+
+                updateCart();
+
+
+                document
+                    .getElementById(
+                        "cartSection"
+                    )
+                    .classList.remove(
+                        "show"
+                    );
+
+
+                showMessage(
+                    "✅ Order placed successfully!",
+                    "success"
+                );
+
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Order error:",
+                    error
+                );
+
+
+                alert(
+                    "Order failed:\n\n" +
+                    error.code +
+                    "\n\n" +
+                    error.message
+                );
+
+            }
+
+
+            finally {
+
+                button.disabled =
+                    false;
+
+                button.textContent =
+                    "PLACE ORDER";
+
+            }
 
         }
     );
