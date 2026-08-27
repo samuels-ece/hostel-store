@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Hostel Store | My Orders</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+<script src="firebase.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+}
+
+.header {
+    background: white;
+    border-bottom: 1px solid #ddd;
+    padding: 15px 20px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #2563eb;
+}
+
+.buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.button {
+    padding: 9px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.logout {
+    color: #dc2626;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 25px 15px 50px;
+}
+
+h1 {
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #667085;
+    margin-top: 0;
+}
+
+.orders {
+    display: grid;
+    gap: 18px;
+    margin-top: 25px;
+}
+
+.order {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.order-id {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.date {
+    color: #667085;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.status {
+    padding: 7px 11px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.accepted {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.items {
+    margin-top: 18px;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+}
+
+.item-name {
+    font-weight: bold;
+}
+
+.item-details {
+    color: #667085;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.item-price {
+    font-weight: bold;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 17px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.empty {
+    background: white;
+    border: 1px dashed #bbb;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    color: #667085;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #667085;
+}
+
+@media(max-width:600px) {
+
+    .header {
+        padding: 12px;
+    }
+
+    .logo {
+        font-size: 15px;
+    }
+
+    .button {
+        padding: 8px;
+        font-size: 11px;
+    }
+
+    .order-header {
+        flex-direction: column;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div class="logo">
+
+        🏪 <span>Hostel Store</span>
+
+    </div>
+
+
+    <div class="buttons">
+
+        <button
+            class="button"
+            onclick="goStudent()">
+
+            🛍️ Store
+
+        </button>
+
+
+        <button
+            class="button logout"
+            id="logoutButton">
+
+            Logout
+
+        </button>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <h1>📦 My Orders</h1>
+
+    <p class="subtitle">
+        Track your hostel store orders.
+    </p>
+
+
+    <div
+        id="ordersContainer"
+        class="orders">
+
+        <div class="loading">
+            Loading your orders...
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+/* ==========================================
+   CHECK LOGIN
+========================================== */
+
+auth.onAuthStateChanged(function(user) {
+
+    if (!user) {
+
+        window.location.replace(
+            "index.html"
+        );
+
+        return;
+
+    }
+
+
+    loadMyOrders(user.uid);
+
+});
+
+
+/* ==========================================
+   LOAD STUDENT ORDERS
+========================================== */
+
+function loadMyOrders(userId) {
+
+    db
+        .collection("orders")
+        .where(
+            "studentId",
+            "==",
+            userId
+        )
+        .onSnapshot(
+
+            function(snapshot) {
+
+                const container =
+                    document.getElementById(
+                        "ordersContainer"
+                    );
+
+
+                container.innerHTML = "";
+
+
+                if (snapshot.empty) {
+
+                    container.innerHTML = `
+
+                        <div class="empty">
+
+                            📦
+
+                            <br><br>
+
+                            You haven't placed
+                            any orders yet.
+
+                            <br><br>
+
+                            Go to the store
+                            and place your first order.
+
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                const orders = [];
+
+
+                snapshot.forEach(function(doc) {
+
+                    orders.push({
+
+                        id: doc.id,
+
+                        data: doc.data()
+
+                    });
+
+                });
+
+
+                orders.sort(function(a, b) {
+
+                    const timeA =
+                        a.data.createdAt
+                            ? a.data.createdAt.seconds
+                            : 0;
+
+                    const timeB =
+                        b.data.createdAt
+                            ? b.data.createdAt.seconds
+                            : 0;
+
+                    return timeB - timeA;
+
+                });
+
+
+                orders.forEach(function(order) {
+
+                    createOrderCard(
+                        order.id,
+                        order.data
+                    );
+
+                });
+
+            },
+
+            function(error) {
+
+                console.error(error);
+
+
+                document
+                    .getElementById(
+                        "ordersContainer"
+                    )
+                    .innerHTML = `
+
+                    <div class="empty">
+
+                        Unable to load orders.
+
+                        <br><br>
+
+                        ${escapeHTML(
+                            error.message
+                        )}
+
+                    </div>
+
+                    `;
+
+            }
+
+        );
+
+}
+
+
+/* ==========================================
+   CREATE ORDER CARD
+========================================== */
+
+function createOrderCard(
+    id,
+    order
+) {
+
+    const container =
+        document.getElementById(
+            "ordersContainer"
+        );
+
+
+    const card =
+        document.createElement("div");
+
+
+    card.className = "order";
+
+
+    const status =
+        order.status || "pending";
+
+
+    let dateText =
+        "Date unavailable";
+
+
+    if (order.createdAt) {
+
+        dateText =
+            order.createdAt
+                .toDate()
+                .toLocaleString();
+
+    }
+
+
+    let itemsHTML = "";
+
+
+    if (Array.isArray(order.items)) {
+
+        order.items.forEach(function(item) {
+
+            const price =
+                Number(
+                    item.price || 0
+                );
+
+
+            const quantity =
+                Number(
+                    item.quantity || 0
+                );
+
+
+            const subtotal =
+                Number(
+                    item.subtotal ||
+                    price * quantity
+                );
+
+
+            itemsHTML += `
+
+                <div class="item">
+
+                    <div>
+
+                        <div class="item-name">
+
+                            ${escapeHTML(
+                                item.name || "Product"
+                            )}
+
+                        </div>
+
+
+                        <div class="item-details">
+
+                            ₹${price.toFixed(2)}
+
+                            ×
+
+                            ${quantity}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="item-price">
+
+                        ₹${subtotal.toFixed(2)}
+
+                    </div>
+
+                </div>
+
+            `;
+
+        });
+
+    }
+
+
+    card.innerHTML = `
+
+        <div class="order-header">
+
+            <div>
+
+                <div class="order-id">
+
+                    Order #${escapeHTML(id)}
+
+                </div>
+
+
+                <div class="date">
+
+                    ${dateText}
+
+                </div>
+
+            </div>
+
+
+            <div class="status ${status}">
+
+                ${status}
+
+            </div>
+
+        </div>
+
+
+        <div class="items">
+
+            ${itemsHTML}
+
+        </div>
+
+
+        <div class="total">
+
+            <span>Total</span>
+
+            <span>
+
+                ₹${Number(
+                    order.total || 0
+                ).toFixed(2)}
+
+            </span>
+
+        </div>
+
+    `;
+
+
+    container.appendChild(card);
+
+}
+
+
+/* ==========================================
+   STORE BUTTON
+========================================== */
+
+function goStudent() {
+
+    window.location.href =
+        "student.html";
+
+}
+
+
+/* ==========================================
+   LOGOUT
+========================================== */
+
+document
+    .getElementById("logoutButton")
+    .addEventListener(
+        "click",
+        async function() {
+
+            try {
+
+                await auth.signOut();
+
+                window.location.replace(
+                    "index.html"
+                );
+
+            }
+
+            catch (error) {
+
+                alert(
+                    "Logout failed:\n\n" +
+                    error.message
+                );
+
+            }
+
+        }
+    );
+
+
+/* ==========================================
+   ESCAPE HTML
+========================================== */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+}
+
+</script>
+
+
+</body>
+
+</html>
