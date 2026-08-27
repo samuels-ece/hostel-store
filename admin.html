@@ -296,6 +296,16 @@ input {
         <small> | ADMIN</small>
     </div>
 
+    <div style="display:flex; gap:8px;">
+
+    <button
+        class="logout"
+        onclick="openOrders()">
+
+        📦 Orders
+
+    </button>
+
     <button
         class="logout"
         id="logoutButton">
@@ -303,6 +313,8 @@ input {
         Logout
 
     </button>
+
+    </div>
 
 </div>
 
@@ -1197,6 +1209,11 @@ function escapeHTML(value) {
         .replace(/'/g, "&#039;");
 
 }
+      function openOrders() {
+
+    window.location.href = "orders.html";
+
+      }
 
 </script>
 
