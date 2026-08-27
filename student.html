@@ -3,1107 +3,585 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<title>Hostel Store | Student</title>
 
-    <title>Hostel Store | Student Dashboard</title>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
-    <link rel="stylesheet" href="style.css">
+<script src="firebase.js"></script>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<style>
 
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+* {
+    box-sizing: border-box;
+}
 
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+}
 
-    <!-- Your Firebase configuration -->
-    <script src="firebase.js"></script>
+/* HEADER */
 
-    <style>
+.header {
+    background: white;
+    border-bottom: 1px solid #ddd;
+    padding: 15px 20px;
 
-        body {
-            display: block;
-            min-height: 100vh;
-            background: #f8fafc;
-        }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .dashboard {
-            width: 100%;
-            min-height: 100vh;
-        }
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+}
 
-        /* =========================
-           HEADER
-        ========================= */
+.logo span {
+    color: #2563eb;
+}
 
-        .topbar {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 15px 20px;
+.logout {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+    padding: 9px 15px;
 
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+    cursor: pointer;
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    font-weight: bold;
+}
 
-        .brand-logo {
-            width: 42px;
-            height: 42px;
+/* MAIN */
 
-            background: #2563eb;
-            color: white;
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 25px 15px 50px;
+}
 
-            border-radius: 12px;
+h1 {
+    margin-bottom: 5px;
+}
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+.subtitle {
+    color: #667085;
+    margin-top: 0;
+}
 
-            font-size: 21px;
-        }
+/* MESSAGE */
 
-        .brand-name {
-            font-size: 18px;
-            font-weight: 700;
-        }
+#message {
+    display: none;
+    padding: 12px;
+    margin: 15px 0;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+}
 
-        .logout-button {
-            border: 1px solid #e2e8f0;
-            background: white;
+.success {
+    display: block !important;
+    background: #dcfce7;
+    color: #166534;
+}
 
-            color: #475569;
+.error {
+    display: block !important;
+    background: #fee2e2;
+    color: #991b1b;
+}
 
-            padding: 9px 13px;
+/* PRODUCTS */
 
-            border-radius: 10px;
+.products {
+    display: grid;
 
-            font-size: 13px;
-            font-weight: 600;
+    grid-template-columns:
+        repeat(auto-fill, minmax(230px, 1fr));
 
-            cursor: pointer;
-        }
+    gap: 18px;
 
-        .logout-button:hover {
-            background: #f8fafc;
-        }
+    margin-top: 25px;
+}
 
+.product {
+    background: white;
 
-        /* =========================
-           MAIN
-        ========================= */
+    border: 1px solid #ddd;
 
-        .main {
-            width: 100%;
-            max-width: 1100px;
+    border-radius: 14px;
 
-            margin: auto;
+    padding: 18px;
 
-            padding: 30px 20px 50px;
-        }
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
 
-        .welcome {
-            margin-bottom: 25px;
-        }
+.product-icon {
+    width: 60px;
+    height: 60px;
 
-        .welcome h1 {
-            font-size: 28px;
-            margin-bottom: 6px;
-        }
+    background: #eff6ff;
 
-        .welcome p {
-            color: #64748b;
-            font-size: 14px;
-        }
+    border-radius: 14px;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-        /* =========================
-           SEARCH
-        ========================= */
+    font-size: 32px;
 
-        .search-box {
-            background: white;
+    margin-bottom: 12px;
+}
 
-            border: 1px solid #e2e8f0;
+.product-name {
+    font-size: 18px;
+    font-weight: bold;
+}
 
-            border-radius: 14px;
+.product-category {
+    color: #667085;
+    font-size: 13px;
 
-            padding: 12px 15px;
+    margin-top: 4px;
+}
 
-            display: flex;
-            align-items: center;
+.price {
+    font-size: 18px;
+    font-weight: bold;
 
-            margin-bottom: 22px;
-        }
+    margin-top: 15px;
+}
 
-        .search-icon {
-            margin-right: 10px;
-            font-size: 18px;
-        }
+.stock {
+    margin-top: 8px;
 
-        .search-box input {
-            border: none;
-            outline: none;
+    font-size: 13px;
 
-            width: 100%;
+    font-weight: bold;
+}
 
-            font-size: 14px;
-        }
+.available {
+    color: #16a34a;
+}
 
+.soldout {
+    color: #dc2626;
+}
 
-        /* =========================
-           CATEGORIES
-        ========================= */
+.empty {
+    background: white;
 
-        .categories {
-            display: flex;
+    padding: 40px;
 
-            gap: 8px;
+    text-align: center;
 
-            overflow-x: auto;
+    border: 1px dashed #bbb;
 
-            padding-bottom: 5px;
+    border-radius: 12px;
 
-            margin-bottom: 28px;
-        }
+    color: #667085;
+}
 
-        .category-button {
-            white-space: nowrap;
+.loading {
+    text-align: center;
 
-            border: 1px solid #e2e8f0;
+    padding: 40px;
 
-            background: white;
+    color: #667085;
+}
 
-            padding: 9px 15px;
 
-            border-radius: 20px;
+/* MOBILE */
 
-            cursor: pointer;
+@media(max-width:600px) {
 
-            font-size: 13px;
+    .container {
+        padding: 20px 12px 40px;
+    }
 
-            font-weight: 600;
+    .products {
+        grid-template-columns: 1fr;
+    }
 
-            color: #475569;
-        }
+}
 
-        .category-button.active {
-            background: #2563eb;
-
-            color: white;
-
-            border-color: #2563eb;
-        }
-
-
-        /* =========================
-           SECTION HEADER
-        ========================= */
-
-        .section-header {
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            margin-bottom: 15px;
-        }
-
-        .section-header h2 {
-            font-size: 20px;
-        }
-
-        .product-count {
-            color: #64748b;
-            font-size: 13px;
-        }
-
-
-        /* =========================
-           PRODUCTS
-        ========================= */
-
-        .products-grid {
-            display: grid;
-
-            grid-template-columns:
-                repeat(auto-fill, minmax(220px, 1fr));
-
-            gap: 16px;
-        }
-
-        .product-card {
-            background: white;
-
-            border: 1px solid #e2e8f0;
-
-            border-radius: 18px;
-
-            padding: 18px;
-
-            transition: 0.2s;
-        }
-
-        .product-card:hover {
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 10px 25px
-                rgba(15, 23, 42, 0.08);
-        }
-
-        .product-icon {
-            width: 55px;
-            height: 55px;
-
-            border-radius: 15px;
-
-            background: #eff6ff;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 28px;
-
-            margin-bottom: 14px;
-        }
-
-        .product-name {
-            font-size: 17px;
-
-            font-weight: 700;
-
-            margin-bottom: 5px;
-        }
-
-        .product-category {
-            color: #64748b;
-
-            font-size: 12px;
-
-            margin-bottom: 14px;
-        }
-
-        .product-bottom {
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-        }
-
-        .price {
-            font-size: 17px;
-
-            font-weight: 700;
-        }
-
-        .availability {
-            padding: 6px 9px;
-
-            border-radius: 8px;
-
-            font-size: 11px;
-
-            font-weight: 700;
-        }
-
-        .available {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .sold-out {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-
-        /* =========================
-           LOADING
-        ========================= */
-
-        .loading {
-            text-align: center;
-
-            padding: 50px 20px;
-
-            color: #64748b;
-
-            font-size: 14px;
-        }
-
-
-        /* =========================
-           EMPTY
-        ========================= */
-
-        .empty {
-            text-align: center;
-
-            padding: 50px 20px;
-
-            background: white;
-
-            border: 1px solid #e2e8f0;
-
-            border-radius: 18px;
-
-            color: #64748b;
-        }
-
-        .empty-icon {
-            font-size: 40px;
-
-            margin-bottom: 10px;
-        }
-
-
-        /* =========================
-           MOBILE
-        ========================= */
-
-        @media (max-width: 600px) {
-
-            .topbar {
-                padding: 12px 15px;
-            }
-
-            .brand-name {
-                font-size: 16px;
-            }
-
-            .main {
-                padding: 25px 15px 40px;
-            }
-
-            .welcome h1 {
-                font-size: 24px;
-            }
-
-            .products-grid {
-                grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
-
-                gap: 10px;
-            }
-
-            .product-card {
-                padding: 13px;
-            }
-
-            .product-icon {
-                width: 48px;
-                height: 48px;
-
-                font-size: 24px;
-            }
-
-            .product-name {
-                font-size: 14px;
-            }
-
-            .price {
-                font-size: 14px;
-            }
-
-            .availability {
-                font-size: 9px;
-                padding: 5px 6px;
-            }
-
-        }
-
-    </style>
+</style>
 
 </head>
 
 
 <body>
 
-<div class="dashboard">
+
+<!-- HEADER -->
+
+<div class="header">
+
+    <div class="logo">
+
+        🏪 <span>Hostel Store</span>
+
+    </div>
 
 
-    <!-- =========================
-         TOP BAR
-    ========================= -->
+    <button
+        id="logoutButton"
+        class="logout">
 
-    <header class="topbar">
+        Logout
 
-        <div class="brand">
-
-            <div class="brand-logo">
-                🏪
-            </div>
-
-            <div class="brand-name">
-                Hostel Store
-            </div>
-
-        </div>
-
-
-        <button
-            class="logout-button"
-            onclick="logout()">
-
-            Logout
-
-        </button>
-
-    </header>
-
-
-
-    <!-- =========================
-         MAIN CONTENT
-    ========================= -->
-
-    <main class="main">
-
-
-        <!-- Welcome -->
-
-        <div class="welcome">
-
-            <h1>
-                Hello, <span id="studentName">Student</span> 👋
-            </h1>
-
-            <p>
-                Check what's available before you visit the store.
-            </p>
-
-        </div>
-
-
-
-        <!-- Search -->
-
-        <div class="search-box">
-
-            <span class="search-icon">
-                🔍
-            </span>
-
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="Search products..."
-                oninput="filterProducts()">
-
-        </div>
-
-
-
-        <!-- Categories -->
-
-        <div
-            class="categories"
-            id="categories">
-
-            <button
-                class="category-button active"
-                onclick="selectCategory('All', this)">
-
-                All
-
-            </button>
-
-        </div>
-
-
-
-        <!-- Section -->
-
-        <div class="section-header">
-
-            <h2>
-                Available Products
-            </h2>
-
-            <span
-                class="product-count"
-                id="productCount">
-
-                Loading...
-
-            </span>
-
-        </div>
-
-
-
-        <!-- Products -->
-
-        <div
-            id="productsContainer"
-            class="products-grid">
-
-            <div class="loading">
-
-                Loading products...
-
-            </div>
-
-        </div>
-
-
-    </main>
+    </button>
 
 </div>
 
 
+<!-- MAIN -->
+
+<div class="container">
+
+
+<h1>Student Store</h1>
+
+<p class="subtitle">
+Available products in the hostel store.
+</p>
+
+
+<div id="message"></div>
+
+
+<div
+    id="productsContainer"
+    class="products">
+
+    <div class="loading">
+
+        Loading products...
+
+    </div>
+
+</div>
+
+
+</div>
+
 
 <script>
 
-    // ==========================================
-    // VARIABLES
-    // ==========================================
 
-    let allProducts = [];
+/* ==========================================
+   MESSAGE
+========================================== */
 
-    let selectedCategory = "All";
+function showMessage(text, type) {
+
+    const message =
+        document.getElementById("message");
+
+    message.textContent = text;
+
+    message.className = type;
+
+}
 
 
+/* ==========================================
+   CHECK LOGIN
+========================================== */
 
-    // ==========================================
-    // CHECK LOGIN
-    // ==========================================
+auth.onAuthStateChanged(function(user) {
 
-    auth.onAuthStateChanged(async function(user) {
+    console.log("Student auth state:", user);
 
-        if (!user) {
 
-            window.location.href = "index.html";
+    if (!user) {
 
-            return;
+        window.location.replace("index.html");
 
-        }
+        return;
 
+    }
+
+
+    console.log(
+        "Student logged in:",
+        user.uid
+    );
+
+
+    loadProducts();
+
+});
+
+
+/* ==========================================
+   LOGOUT
+========================================== */
+
+document
+    .getElementById("logoutButton")
+    .addEventListener("click", async function() {
 
         try {
 
-            const userDoc =
-                await db.collection("users")
-                        .doc(user.uid)
-                        .get();
+            console.log("Logging out...");
 
+            await auth.signOut();
 
-            if (!userDoc.exists) {
+            console.log("Logout successful");
 
-                await auth.signOut();
+            window.location.replace("index.html");
 
-                window.location.href = "index.html";
+        }
 
-                return;
+        catch (error) {
 
-            }
+            console.error(
+                "Logout error:",
+                error
+            );
 
-
-            const userData =
-                userDoc.data();
-
-
-            // Make sure this is a student
-
-            if (userData.role !== "student") {
-
-                await auth.signOut();
-
-                window.location.href = "index.html";
-
-                return;
-
-            }
-
-
-            // Display name
-
-            document.getElementById("studentName")
-                    .textContent =
-                    userData.name || "Student";
-
-
-            // Load products
-
-            loadProducts();
-
-
-        } catch (error) {
-
-            console.error(error);
+            alert(
+                "Logout failed:\n\n" +
+                error.code +
+                "\n\n" +
+                error.message
+            );
 
         }
 
     });
 
 
+/* ==========================================
+   LOAD PRODUCTS
+========================================== */
 
-    // ==========================================
-    // LOAD PRODUCTS FROM FIRESTORE
-    // ==========================================
+function loadProducts() {
 
-    function loadProducts() {
-
-        db.collection("products")
-          .onSnapshot(function(snapshot) {
-
-              allProducts = [];
+    console.log("Loading products...");
 
 
-              snapshot.forEach(function(doc) {
+    db
+        .collection("products")
+        .onSnapshot(
 
-                  const product =
-                      doc.data();
+            function(snapshot) {
 
-
-                  product.id =
-                      doc.id;
-
-
-                  allProducts.push(product);
-
-              });
-
-
-              createCategories();
-
-              displayProducts();
-
-          }, function(error) {
-
-              console.error(
-                  "Firestore error:",
-                  error
-              );
-
-
-              document.getElementById(
-                  "productsContainer"
-              ).innerHTML = `
-
-                  <div class="empty">
-
-                      <div class="empty-icon">
-                          ⚠️
-                      </div>
-
-                      <strong>
-                          Unable to load products
-                      </strong>
-
-                      <p>
-                          Please try again later.
-                      </p>
-
-                  </div>
-
-              `;
-
-          });
-
-    }
-
-
-
-    // ==========================================
-    // CREATE CATEGORY BUTTONS
-    // ==========================================
-
-    function createCategories() {
-
-        const categoryContainer =
-            document.getElementById(
-                "categories"
-            );
-
-
-        categoryContainer.innerHTML = `
-
-            <button
-                class="category-button active"
-                onclick="selectCategory('All', this)">
-
-                All
-
-            </button>
-
-        `;
-
-
-        const categories = [];
-
-
-        allProducts.forEach(function(product) {
-
-            if (
-                product.category &&
-                !categories.includes(
-                    product.category
-                )
-            ) {
-
-                categories.push(
-                    product.category
-                );
-
-            }
-
-        });
-
-
-        categories.sort();
-
-
-        categories.forEach(function(category) {
-
-            const button =
-                document.createElement(
-                    "button"
+                console.log(
+                    "Products found:",
+                    snapshot.size
                 );
 
 
-            button.className =
-                "category-button";
-
-
-            button.textContent =
-                category;
-
-
-            button.onclick =
-                function() {
-
-                    selectCategory(
-                        category,
-                        button
-                    );
-
-                };
-
-
-            categoryContainer.appendChild(
-                button
-            );
-
-        });
-
-    }
-
-
-
-    // ==========================================
-    // SELECT CATEGORY
-    // ==========================================
-
-    function selectCategory(
-        category,
-        button
-    ) {
-
-        selectedCategory =
-            category;
-
-
-        document
-            .querySelectorAll(
-                ".category-button"
-            )
-            .forEach(function(btn) {
-
-                btn.classList.remove(
-                    "active"
-                );
-
-            });
-
-
-        button.classList.add(
-            "active"
-        );
-
-
-        displayProducts();
-
-    }
-
-
-
-    // ==========================================
-    // SEARCH + CATEGORY FILTER
-    // ==========================================
-
-    function filterProducts() {
-
-        displayProducts();
-
-    }
-
-
-
-    // ==========================================
-    // DISPLAY PRODUCTS
-    // ==========================================
-
-    function displayProducts() {
-
-        const container =
-            document.getElementById(
-                "productsContainer"
-            );
-
-
-        const search =
-            document.getElementById(
-                "searchInput"
-            )
-            .value
-            .toLowerCase()
-            .trim();
-
-
-        let filteredProducts =
-            allProducts.filter(
-                function(product) {
-
-                    const name =
-                        (product.name || "")
-                        .toLowerCase();
-
-
-                    const category =
-                        (product.category || "")
-                        .toLowerCase();
-
-
-                    const matchesSearch =
-                        name.includes(search) ||
-                        category.includes(search);
-
-
-                    const matchesCategory =
-                        selectedCategory === "All" ||
-                        product.category ===
-                        selectedCategory;
-
-
-                    return (
-                        matchesSearch &&
-                        matchesCategory
-                    );
-
-                }
-            );
-
-
-        // Product count
-
-        document.getElementById(
-            "productCount"
-        ).textContent =
-            filteredProducts.length +
-            " product" +
-            (
-                filteredProducts.length === 1
-                    ? ""
-                    : "s"
-            );
-
-
-        // Empty result
-
-        if (
-            filteredProducts.length === 0
-        ) {
-
-            container.innerHTML = `
-
-                <div class="empty">
-
-                    <div class="empty-icon">
-                        🔎
-                    </div>
-
-                    <strong>
-                        No products found
-                    </strong>
-
-                    <p>
-                        Try another search or category.
-                    </p>
-
-                </div>
-
-            `;
-
-            return;
-
-        }
-
-
-        container.innerHTML = "";
-
-
-        filteredProducts.forEach(
-            function(product) {
-
-                const card =
-                    document.createElement(
-                        "div"
+                const container =
+                    document.getElementById(
+                        "productsContainer"
                     );
 
 
-                card.className =
-                    "product-card";
+                container.innerHTML = "";
 
 
-                const stock =
-                    Number(product.stock || 0);
+                let count = 0;
 
 
-                const available =
-                    product.available === true &&
-                    stock > 0;
+                snapshot.forEach(function(doc) {
+
+                    const product =
+                        doc.data();
 
 
-                const icon =
-                    product.icon || "🛍️";
+                    console.log(
+                        "Product:",
+                        doc.id,
+                        product
+                    );
 
 
-                let availabilityHTML;
+                    const stock =
+                        Number(
+                            product.stock || 0
+                        );
 
 
-                if (available) {
+                    /*
+                       Show only products that
+                       have stock available.
+                    */
 
-                    availabilityHTML = `
+                    if (
+                        product.available === true &&
+                        stock > 0
+                    ) {
 
-                        <span
-                            class="availability available">
+                        createProduct(
+                            doc.id,
+                            product
+                        );
 
-                            🟢 ${stock} left
+                        count++;
 
-                        </span>
+                    }
 
-                    `;
-
-                } else {
-
-                    availabilityHTML = `
-
-                        <span
-                            class="availability sold-out">
-
-                            🔴 Sold Out
-
-                        </span>
-
-                    `;
-
-                }
+                });
 
 
-                card.innerHTML = `
+                if (count === 0) {
 
-                    <div class="product-icon">
+                    container.innerHTML = `
 
-                        ${icon}
+                        <div class="empty">
 
-                    </div>
+                            No products are
+                            currently available.
 
+                            <br><br>
 
-                    <div class="product-name">
-
-                        ${escapeHTML(
-                            product.name ||
-                            "Product"
-                        )}
-
-                    </div>
-
-
-                    <div class="product-category">
-
-                        ${escapeHTML(
-                            product.category ||
-                            "General"
-                        )}
-
-                    </div>
-
-
-                    <div class="product-bottom">
-
-                        <div class="price">
-
-                            ₹${Number(
-                                product.price || 0
-                            ).toFixed(2)}
+                            Please check again later.
 
                         </div>
 
-                        ${availabilityHTML}
+                    `;
 
-                    </div>
+                }
 
-                `;
+            },
 
 
-                container.appendChild(
-                    card
+            function(error) {
+
+                console.error(
+                    "Product loading error:",
+                    error
+                );
+
+
+                showMessage(
+                    "Unable to load products: " +
+                    error.message,
+                    "error"
                 );
 
             }
+
         );
 
-    }
+}
 
 
+/* ==========================================
+   CREATE PRODUCT
+========================================== */
 
-    // ==========================================
-    // SECURITY HELPER
-    // ==========================================
+function createProduct(id, product) {
 
-    function escapeHTML(value) {
-
-        return String(value)
-
-            .replace(/&/g, "&amp;")
-
-            .replace(/</g, "&lt;")
-
-            .replace(/>/g, "&gt;")
-
-            .replace(/"/g, "&quot;")
-
-            .replace(/'/g, "&#039;");
-
-    }
+    const container =
+        document.getElementById(
+            "productsContainer"
+        );
 
 
+    const card =
+        document.createElement("div");
 
-    // ==========================================
-    // LOGOUT
-    // ==========================================
 
-    function logout() {
+    card.className = "product";
 
-        auth.signOut()
-            .then(function() {
 
-                window.location.href =
-  
+    const stock =
+        Number(
+            product.stock || 0
+        );
+
+
+    card.innerHTML = `
+
+        <div class="product-icon">
+
+            ${escapeHTML(
+                product.icon || "🛍️"
+            )}
+
+        </div>
+
+
+        <div class="product-name">
+
+            ${escapeHTML(
+                product.name || "Product"
+            )}
+
+        </div>
+
+
+        <div class="product-category">
+
+            ${escapeHTML(
+                product.category || "General"
+            )}
+
+        </div>
+
+
+        <div class="price">
+
+            ₹${Number(
+                product.price || 0
+            ).toFixed(2)}
+
+        </div>
+
+
+        <div class="stock available">
+
+            🟢 ${stock} available
+
+        </div>
+
+    `;
+
+
+    container.appendChild(card);
+
+}
+
+
+/* ==========================================
+   ESCAPE HTML
+========================================== */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+}
+
+</script>
+
+
+</body>
+
+</html>
