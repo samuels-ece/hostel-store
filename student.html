@@ -322,25 +322,35 @@ h1 {
 
 
     <div class="header-right">
+<div class="header-right">
 
-        <button
-            id="cartButton"
-            class="cart-button">
+    <button
+        id="cartButton"
+        class="cart-button">
 
-            🛒 Cart (<span id="cartCount">0</span>)
+        🛒 Cart (<span id="cartCount">0</span>)
 
-        </button>
+    </button>
 
 
-        <button
-            id="logoutButton"
-            class="logout">
+    <button
+        id="ordersButton"
+        class="logout">
 
-            Logout
+        📦 My Orders
 
-        </button>
+    </button>
 
-    </div>
+
+    <button
+        id="logoutButton"
+        class="logout">
+
+        Logout
+
+    </button>
+
+</div>
 
 </div>
 
@@ -1236,6 +1246,21 @@ function escapeHTML(value) {
 
 updateCart();
 
+      /* ==========================================
+   MY ORDERS BUTTON
+========================================== */
+
+document
+    .getElementById("ordersButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            window.location.href =
+                "my-orders.html";
+
+        }
+    );
 </script>
 
 </body>
