@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Hostel Store | Admin</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+    <script src="firebase.js"></script>
+
+    <style>
+
+        body {
+            display: block;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+
+        .admin-page {
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+
+            background: #2563eb;
+            color: white;
+
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 21px;
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .admin-label {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .logout-button {
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #475569;
+
+            padding: 9px 13px;
+            border-radius: 10px;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        .main {
+            width: 100%;
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px 20px 50px;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .page-heading p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* STAT CARDS */
+
+        .stats {
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 16px;
+
+            padding: 18px;
+        }
+
+        .stat-title {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        /* ADD PRODUCT */
+
+        .add-card {
+            background: white;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 18px;
+
+            padding: 22px;
+
+            margin-bottom: 25px;
+        }
+
+        .add-card h2 {
+            font-size: 19px;
+            margin-bottom: 18px;
+        }
+
+        .form-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 2px;
+        }
+
+        .form-group label {
+            display: block;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            margin-bottom: 7px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+
+            padding: 12px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 10px;
+
+            outline: none;
+
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #2563eb;
+        }
+
+        .add-button {
+            margin-top: 17px;
+
+            width: 100%;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 11px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        .add-button:disabled {
+            opacity: 0.6;
+        }
+
+        /* PRODUCTS */
+
+        .products-section {
+            background: white;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 18px;
+
+            padding: 22px;
+        }
+
+        .products-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 18px;
+        }
+
+        .products-header h2 {
+            font-size: 19px;
+        }
+
+        .products-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fill, minmax(230px, 1fr));
+
+            gap: 15px;
+        }
+
+        .product-card {
+            border: 1px solid #e2e8f0;
+
+            border-radius: 15px;
+
+            padding: 16px;
+        }
+
+        .product-top {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 15px;
+        }
+
+        .product-icon {
+            width: 48px;
+            height: 48px;
+
+            border-radius: 12px;
+
+            background: #eff6ff;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 24px;
+        }
+
+        .product-name {
+            font-weight: 700;
+
+            font-size: 15px;
+        }
+
+        .product-category {
+            color: #64748b;
+
+            font-size: 11px;
+
+            margin-top: 3px;
+        }
+
+        .product-info {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 8px;
+
+            margin-bottom: 14px;
+        }
+
+        .info-box {
+            background: #f8fafc;
+
+            border-radius: 9px;
+
+            padding: 9px;
+        }
+
+        .info-label {
+            color: #64748b;
+
+            font-size: 10px;
+        }
+
+        .info-value {
+            font-size: 14px;
+
+            font-weight: 700;
+
+            margin-top: 3px;
+        }
+
+        .stock-input {
+            width: 100%;
+
+            padding: 10px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 9px;
+
+            margin-bottom: 9px;
+        }
+
+        .availability-select {
+            width: 100%;
+
+            padding: 10px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 9px;
+
+            margin-bottom: 9px;
+        }
+
+        .update-button {
+            width: 100%;
+
+            padding: 10px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: #0f172a;
+
+            color: white;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        .delete-button {
+            width: 100%;
+
+            padding: 9px;
+
+            border: 1px solid #fecaca;
+
+            border-radius: 9px;
+
+            background: white;
+
+            color: #dc2626;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            margin-top: 7px;
+        }
+
+        .message {
+            display: none;
+
+            padding: 11px;
+
+            border-radius: 10px;
+
+            margin-bottom: 15px;
+
+            font-size: 13px;
+
+            text-align: center;
+        }
+
+        .message.success {
+            display: block;
+
+            background: #dcfce7;
+
+            color: #166534;
+        }
+
+        .message.error {
+            display: block;
+
+            background: #fee2e2;
+
+            color: #b91c1c;
+        }
+
+        .empty {
+            text-align: center;
+
+            padding: 35px;
+
+            color: #64748b;
+
+            border: 1px dashed #cbd5e1;
+
+            border-radius: 12px;
+        }
+
+        @media (max-width: 600px) {
+
+            .main {
+                padding: 22px 14px 40px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-heading h1 {
+                font-size: 24px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="admin-page">
+
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                🏪
+            </div>
+
+            <div>
+
+                <div class="brand-name">
+                    Hostel Store
+                </div>
+
+                <div class="admin-label">
+                    ADMIN PANEL
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="logout-button"
+            onclick="logout()">
+
+            Logout
+
+        </button>
+
+    </header>
+
+
+
+    <main class="main">
+
+
+        <!-- HEADING -->
+
+        <div class="page-heading">
+
+            <h1>
+                Store Management
+            </h1>
+
+            <p>
+                Add products and manage current stock.
+            </p>
+
+        </div>
+
+
+
+        <!-- STATS -->
+
+        <div class="stats">
+
+            <div class="stat-card">
+
+                <div class="stat-title">
+                    TOTAL PRODUCTS
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="totalProducts">
+
+                    0
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-title">
+                    AVAILABLE
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="availableProducts">
+
+                    0
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-title">
+                    SOLD OUT
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="soldOutProducts">
+
+                    0
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- MESSAGE -->
+
+        <div
+            id="message"
+            class="message">
+        </div>
+
+
+
+        <!-- ADD PRODUCT -->
+
+        <div class="add-card">
+
+            <h2>
+                Add New Product
+            </h2>
+
+
+            <form id="productForm">
+
+
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Product Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="productName"
+                            placeholder="Example: Dairy Milk"
+                            required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Category
+                        </label>
+
+                        <input
+                            type="text"
+                            id="productCategory"
+                            placeholder="Example: Chocolate"
+                            required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Price (₹)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="productPrice"
+                            placeholder="40"
+                            min="0"
+                            step="0.01"
+                            required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Stock
+                        </label>
+
+                        <input
+                            type="number"
+                            id="productStock"
+                            placeholder="10"
+                            min="0"
+                            required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Icon / Emoji
+                        </label>
+
+                        <input
+                            type="text"
+                            id="productIcon"
+                            placeholder="🍫"
+                            maxlength="4">
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="add-button"
+                    id="addButton">
+
+                    + ADD PRODUCT
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- PRODUCT LIST -->
+
+        <div class="products-section">
+
+            <div class="products-header">
+
+                <h2>
+                    Manage Products
+                </h2>
+
+            </div>
+
+
+            <div
+                id="productsContainer"
+                class="products-grid">
+
+                <div class="empty">
+                    Loading products...
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+
+<script>
+
+    // ==========================================
+    // CHECK ADMIN
+    // ==========================================
+
+    auth.onAuthStateChanged(async function(user) {
+
+        if (!user) {
+
+            window.location.href =
+                "index.html";
+
+            return;
+
+        }
+
+
+        try {
+
+            const userDoc =
+                await db.collection("users")
+                        .doc(user.uid)
+                        .get();
+
+
+            if (!userDoc.exists) {
+
+                await auth.signOut();
+
+                window.location.href =
+                    "index.html";
+
+                return;
+
+            }
+
+
+            const userData =
+                userDoc.data();
+
+
+            if (userData.role !== "admin") {
+
+                alert(
+                    "Access denied. Admin only."
+                );
+
+                await auth.signOut();
+
+                window.location.href =
+                    "index.html";
+
+                return;
+
+            }
+
+
+            // Admin verified
+
+            loadProducts();
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Unable to verify admin account."
+            );
+
+        }
+
+    });
+
+
+
+    // ==========================================
+    // LOAD PRODUCTS
+    // ==========================================
+
+    function loadProducts() {
+
+        db.collection("products")
+          .onSnapshot(function(snapshot) {
+
+              const container =
+                  document.getElementById(
+                      "productsContainer"
+                  );
+
+
+              container.innerHTML = "";
+
+
+              let available = 0;
+
+              let soldOut = 0;
+
+
+              if (snapshot.empty) {
+
+                  container.innerHTML = `
+
+                      <div class="empty">
+
+                          No products yet.
+
+                          <br><br>
+
+                          Add your first product above.
+
+                      </div>
+
+                  `;
+
+              }
+
+
+              snapshot.forEach(function(doc) {
+
+                  const product =
+                      doc.data();
+
+
+                  const stock =
+                      Number(
+                          product.stock || 0
+                      );
+
+
+                  const isAvailable =
+                      product.available === true &&
+                      stock > 0;
+
+
+                  if (isAvailable) {
+
+                      available++;
+
+                  } else {
+
+                      soldOut++;
+
+                  }
+
+
+                  createProductCard(
+                      doc.id,
+                      product
+                  );
+
+              });
+
+
+              document.getElementById(
+                  "totalProducts"
+              ).textContent =
+                  snapshot.size;
+
+
+              document.getElementById(
+                  "availableProducts"
+              ).textContent =
+                  available;
+
+
+              document.getElementById(
+                  "soldOutProducts"
+              ).textContent =
+                  soldOut;
+
+          }, function(error) {
+
+              console.error(error);
+
+              showMessage(
+                  "Unable to load products.",
+                  "error"
+              );
+
+          });
+
+    }
+
+
+
+    // ==========================================
+    // CREATE PRODUCT CARD
+    // ==========================================
+
+    function createProductCard(
+        id,
+        product
+    ) {
+
+        const container =
+            document.getElementById(
+                "productsContainer"
+            );
+
+
+        const card =
+            document.createElement(
+                "div"
+            );
+
+
+        card.className =
+            "product-card";
+
+
+        const stock =
+            Number(
+                product.stock || 0
+            );
+
+
+        const available =
+            product.available === true;
+
+
+        card.innerHTML = `
+
+            <div class="product-top">
+
+                <div class="product-icon">
+
+                    ${escapeHTML(
+                        product.icon || "🛍️"
+                    )}
+
+                </div>
+
+                <div>
+
+                    <div class="product-name">
+
+                        ${escapeHTML(
+                            product.name ||
+                            "Product"
+                        )}
+
+                    </div>
+
+                    <div class="product-category">
+
+                        ${escapeHTML(
+                            product.category ||
+                            "General"
+                        )}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="product-info">
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        PRICE
+                    </div>
+
+                    <div class="info-value">
+
+                        ₹${Number(
+                            product.price || 0
+                        ).toFixed(2)}
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        CURRENT STOCK
+                    </div>
+
+                    <div class="info-value">
+
+                        ${stock}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <input
+                type="number"
+                min="0"
+                class="stock-input"
+                id="stock-${id}"
+                value="${stock}"
+                placeholder="Stock">
+
+
+            <select
+                class="availability-select"
+                id="available-${id}">
+
+                <option
+                    value="true"
+                    ${available ? "selected" : ""}>
+
+                    Available
+
+                </option>
+
+                <option
+                    value="false"
+                    ${!available ? "selected" : ""}>
+
+                    Sold Out
+
+                </option>
+
+            </select>
+
+
+            <button
+                class="update-button"
+                onclick="updateProduct('${id}')">
+
+                SAVE CHANGES
+
+            </button>
+
+
+            <button
+                class="delete-button"
+                onclick="deleteProduct('${id}')">
+
+                DELETE PRODUCT
+
+            </button>
+
+        `;
+
+
+        container.appendChild(card);
+
+    }
+
+
+
+    
