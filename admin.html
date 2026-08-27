@@ -820,13 +820,21 @@
 
         } catch (error) {
 
-            console.error(error);
+    console.error(error);
 
-            alert(
-                "Unable to verify admin account."
-            );
+    showMessage(
+        "ERROR: " + error.message,
+        "error"
+    );
 
-        }
+    alert(
+        "Firebase Error:\n\n" +
+        error.code +
+        "\n\n" +
+        error.message
+    );
+
+                }
 
     });
 
