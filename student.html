@@ -281,6 +281,60 @@ h1 {
     font-weight: bold;
     cursor: pointer;
 }
+/* ==========================================
+   SEARCH AND FILTER
+========================================== */
+
+.filter-section {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ccc;
+    border-radius: 9px;
+    font-size: 15px;
+    outline: none;
+}
+
+.search-box input:focus {
+    border-color: #2563eb;
+}
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 12px;
+}
+
+.filter-row select {
+    flex: 1;
+    padding: 11px;
+    border: 1px solid #ccc;
+    border-radius: 9px;
+    background: white;
+    font-size: 14px;
+}
+
+.available-filter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.available-filter input {
+    width: auto;
+}
 
 @media(max-width:600px) {
 
@@ -300,6 +354,15 @@ h1 {
     .logout {
         padding: 8px 9px;
         font-size: 12px;
+    }
+
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .available-filter {
+        padding: 5px 0;
     }
 
 }
@@ -367,6 +430,49 @@ Choose products and add them to your cart.
 
 
 <div id="message"></div>
+
+
+<!-- SEARCH AND FILTER -->
+
+<div class="filter-section">
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍 Search products..."
+        >
+
+    </div>
+
+
+    <div class="filter-row">
+
+        <select id="categoryFilter">
+
+            <option value="all">
+                All Categories
+            </option>
+
+        </select>
+
+
+        <label class="available-filter">
+
+            <input
+                type="checkbox"
+                id="availableOnly"
+                checked
+            >
+
+            Available only
+
+        </label>
+
+    </div>
+
+</div>
 
 
 <!-- PRODUCTS -->
@@ -518,7 +624,6 @@ document
 /* ==========================================
    LOAD PRODUCTS
 ========================================== */
-
 function loadProducts() {
 
     db
@@ -527,86 +632,50 @@ function loadProducts() {
 
             function(snapshot) {
 
-                const container =
-                    document.getElementById(
-                        "productsContainer"
-                    );
-
-
-                container.innerHTML = "";
-
                 products = {};
-
-
-                let count = 0;
-
 
                 snapshot.forEach(function(doc) {
 
                     const product =
                         doc.data();
 
-
                     const stock =
                         Number(
                             product.stock || 0
                         );
 
+                    products[doc.id] = {
 
-                    if (
-                        product.available === true &&
-                        stock > 0
-                    ) {
+                        id: doc.id,
 
-                        products[doc.id] = {
+                        name:
+                            product.name || "Product",
 
-                            id: doc.id,
+                        category:
+                            product.category || "General",
 
-                            name:
-                                product.name || "Product",
+                        price:
+                            Number(
+                                product.price || 0
+                            ),
 
-                            category:
-                                product.category || "General",
+                        stock: stock,
 
-                            price:
-                                Number(
-                                    product.price || 0
-                                ),
+                        available:
+                            product.available === true &&
+                            stock > 0,
 
-                            stock: stock,
+                        icon:
+                            product.icon || "🛍️"
 
-                            icon:
-                                product.icon || "🛍️"
-
-                        };
-
-
-                        createProduct(
-                            products[doc.id]
-                        );
-
-
-                        count++;
-
-                    }
+                    };
 
                 });
 
 
-                if (count === 0) {
+                createCategoryOptions();
 
-                    container.innerHTML = `
-
-                        <div class="empty">
-
-                            No products are
-                            currently available.
-
-                        </div>
-
-                    `;
-
-                }
+                displayProducts();
 
             },
 
@@ -626,6 +695,159 @@ function loadProducts() {
 
 }
 
+/* ==========================================
+   CREATE CATEGORY OPTIONS
+========================================== */
+
+function createCategoryOptions() {
+
+    const categoryFilter =
+        document.getElementById(
+            "categoryFilter"
+        );
+
+    const categories = new Set();
+
+
+    Object.values(products).forEach(
+        function(product) {
+
+            categories.add(
+                product.category
+            );
+
+        }
+    );
+
+
+    categoryFilter.innerHTML = `
+
+        <option value="all">
+            All Categories
+        </option>
+
+    `;
+
+
+    Array.from(categories)
+        .sort()
+        .forEach(function(category) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value = category;
+
+            option.textContent = category;
+
+            categoryFilter.appendChild(
+                option
+            );
+
+        });
+
+}
+
+
+/* ==========================================
+   DISPLAY FILTERED PRODUCTS
+========================================== */
+
+function displayProducts() {
+
+    const container =
+        document.getElementById(
+            "productsContainer"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const searchText =
+        document
+            .getElementById("searchInput")
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const selectedCategory =
+        document.getElementById(
+            "categoryFilter"
+        ).value;
+
+
+    const availableOnly =
+        document.getElementById(
+            "availableOnly"
+        ).checked;
+
+
+    let count = 0;
+
+
+    Object.values(products).forEach(
+        function(product) {
+
+            const matchesSearch =
+                product.name
+                    .toLowerCase()
+                    .includes(searchText);
+
+
+            const matchesCategory =
+                selectedCategory === "all" ||
+                product.category ===
+                selectedCategory;
+
+
+            const matchesAvailability =
+                !availableOnly ||
+                product.available;
+
+
+            if (
+                matchesSearch &&
+                matchesCategory &&
+                matchesAvailability
+            ) {
+
+                createProduct(product);
+
+                count++;
+
+            }
+
+        }
+    );
+
+
+    if (count === 0) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                🔍 No matching products found.
+
+                <br><br>
+
+                Try another search or category.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+
+
 
 /* ==========================================
    CREATE PRODUCT
@@ -644,6 +866,113 @@ function createProduct(product) {
 
 
     card.className = "product";
+
+
+    const soldOut =
+        !product.available ||
+        product.stock <= 0;
+
+
+    let quantityHTML = "";
+
+
+    if (soldOut) {
+
+        quantityHTML = `
+
+            <div class="stock"
+                 style="color:#dc2626;">
+
+                🔴 SOLD OUT
+
+            </div>
+
+        `;
+
+    }
+
+    else {
+
+        quantityHTML = `
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQuantity(
+                        '${product.id}',
+                        -1
+                    )">
+
+                    −
+
+                </button>
+
+
+                <span
+                    id="qty-${product.id}">
+
+                    1
+
+                </span>
+
+
+                <button
+                    onclick="changeQuantity(
+                        '${product.id}',
+                        1
+                    )">
+
+                    +
+
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+
+    let buttonHTML = "";
+
+
+    if (soldOut) {
+
+        buttonHTML = `
+
+            <button
+                class="add-cart"
+                disabled
+                style="
+                    background:#9ca3af;
+                    cursor:not-allowed;
+                ">
+
+                SOLD OUT
+
+            </button>
+
+        `;
+
+    }
+
+    else {
+
+        buttonHTML = `
+
+            <button
+                class="add-cart"
+                onclick="addToCart(
+                    '${product.id}'
+                )">
+
+                🛒 ADD TO CART
+
+            </button>
+
+        `;
+
+    }
 
 
     card.innerHTML = `
@@ -676,56 +1005,29 @@ function createProduct(product) {
         </div>
 
 
-        <div class="stock">
+        <div
+            class="stock"
+            style="${
+                soldOut
+                ? 'color:#dc2626;'
+                : ''
+            }">
 
-            🟢 ${product.stock} available
-
-        </div>
-
-
-        <div class="quantity">
-
-            <button
-                onclick="changeQuantity(
-                    '${product.id}',
-                    -1
-                )">
-
-                −
-
-            </button>
-
-
-            <span
-                id="qty-${product.id}">
-
-                1
-
-            </span>
-
-
-            <button
-                onclick="changeQuantity(
-                    '${product.id}',
-                    1
-                )">
-
-                +
-
-            </button>
+            ${
+                soldOut
+                ? '🔴 0 available'
+                : '🟢 ' +
+                  product.stock +
+                  ' available'
+            }
 
         </div>
 
 
-        <button
-            class="add-cart"
-            onclick="addToCart(
-                '${product.id}'
-            )">
+        ${quantityHTML}
 
-            🛒 ADD TO CART
 
-        </button>
+        ${buttonHTML}
 
     `;
 
@@ -1238,7 +1540,44 @@ function escapeHTML(value) {
         );
 
 }
+/* ==========================================
+   SEARCH AND FILTER EVENTS
+========================================== */
 
+document
+    .getElementById("searchInput")
+    .addEventListener(
+        "input",
+        function() {
+
+            displayProducts();
+
+        }
+    );
+
+
+document
+    .getElementById("categoryFilter")
+    .addEventListener(
+        "change",
+        function() {
+
+            displayProducts();
+
+        }
+    );
+
+
+document
+    .getElementById("availableOnly")
+    .addEventListener(
+        "change",
+        function() {
+
+            displayProducts();
+
+        }
+    );
 
 /* ==========================================
    INITIAL CART
