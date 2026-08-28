@@ -40,7 +40,7 @@ body {
 
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 100;
 }
 
 .logo {
@@ -85,10 +85,112 @@ h1 {
     margin-top: 0;
 }
 
+/* ==========================================
+   STATISTICS
+========================================== */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 25px 0;
+}
+
+.stat {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 18px;
+}
+
+.stat-title {
+    font-size: 12px;
+    color: #667085;
+    font-weight: bold;
+}
+
+.stat-number {
+    font-size: 25px;
+    font-weight: bold;
+    margin-top: 7px;
+}
+
+/* ==========================================
+   FILTERS
+========================================== */
+
+.order-filters {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.order-filters input,
+.order-filters select {
+    padding: 12px 14px;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+}
+
+.order-filters input {
+    flex: 1;
+}
+
+.order-filters select {
+    min-width: 160px;
+}
+
+.order-filters input:focus,
+.order-filters select:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+/* ==========================================
+   SECTION
+========================================== */
+
+.order-section {
+    margin-top: 30px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.section-title {
+    margin: 0;
+    font-size: 22px;
+}
+
+.section-description {
+    color: #667085;
+    font-size: 13px;
+    margin: 4px 0 0;
+}
+
+.section-count {
+    background: #eef2ff;
+    color: #3730a3;
+    padding: 7px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* ==========================================
+   ORDERS
+========================================== */
+
 .orders {
     display: grid;
     gap: 18px;
-    margin-top: 25px;
 }
 
 .order {
@@ -114,6 +216,7 @@ h1 {
     color: #667085;
     font-size: 13px;
     margin-top: 5px;
+    line-height: 1.5;
 }
 
 .status {
@@ -122,6 +225,7 @@ h1 {
     font-size: 11px;
     font-weight: bold;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .pending {
@@ -139,11 +243,11 @@ h1 {
     color: #991b1b;
 }
 
-      .collected {
+.collected {
     background: #dbeafe;
     color: #1d4ed8;
-      }
-      
+}
+
 .items {
     margin-top: 18px;
 }
@@ -151,6 +255,7 @@ h1 {
 .item {
     display: flex;
     justify-content: space-between;
+    gap: 15px;
     padding: 10px 0;
     border-bottom: 1px solid #eee;
 }
@@ -167,6 +272,7 @@ h1 {
 
 .item-price {
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .total {
@@ -205,11 +311,30 @@ h1 {
     cursor: pointer;
 }
 
+.collect {
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 18px;
+    background: #16a34a;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.collect:active,
+.accept:active,
+.reject:active,
+.button:active {
+    transform: scale(0.98);
+}
+
 .empty {
     background: white;
     border: 1px dashed #bbb;
     border-radius: 12px;
-    padding: 40px;
+    padding: 35px;
     text-align: center;
     color: #667085;
 }
@@ -219,43 +344,19 @@ h1 {
     padding: 40px;
     color: #667085;
 }
+
 /* ==========================================
-   ORDER STATISTICS
+   MOBILE
 ========================================== */
 
-.order-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin: 25px 0;
-}
+@media(max-width:800px) {
 
-.order-stat {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 18px;
-}
-
-.order-stat-title {
-    font-size: 12px;
-    color: #667085;
-    font-weight: bold;
-}
-
-.order-stat-number {
-    font-size: 26px;
-    font-weight: bold;
-    margin-top: 7px;
-}
-
-@media(max-width:600px) {
-
-    .order-stats {
-        grid-template-columns: 1fr 1fr;
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
     }
 
 }
+
 @media(max-width:600px) {
 
     .header {
@@ -271,52 +372,22 @@ h1 {
         font-size: 12px;
     }
 
-    .order-header {
-        flex-direction: column;
+    .container {
+        padding: 20px 12px 40px;
     }
 
-    .actions {
-        flex-direction: column;
+    .stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
     }
 
-}
-/* ==========================================
-   ORDER FILTERS
-========================================== */
+    .stat {
+        padding: 15px;
+    }
 
-.order-filters {
-    display: flex;
-    gap: 12px;
-    margin: 20px 0;
-}
-
-.order-filters input,
-.order-filters select {
-    padding: 12px 14px;
-    border: 1px solid #d0d5dd;
-    border-radius: 8px;
-    font-size: 14px;
-    background: white;
-}
-
-.order-filters input {
-    flex: 1;
-}
-
-.order-filters select {
-    min-width: 160px;
-}
-
-.order-filters input:focus,
-.order-filters select:focus {
-    outline: none;
-    border-color: #2563eb;
-}
-
-
-/* MOBILE */
-
-@media(max-width:600px) {
+    .stat-number {
+        font-size: 22px;
+    }
 
     .order-filters {
         flex-direction: column;
@@ -326,20 +397,35 @@ h1 {
         width: 100%;
     }
 
+    .order-header {
+        flex-direction: column;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .item {
+        align-items: flex-start;
+    }
+
+    .section-header {
+        align-items: flex-start;
+    }
+
 }
+
 </style>
 
 </head>
 
 <body>
 
-
 <header class="header">
 
     <div class="logo">
         🏪 <span>Hostel Store</span>
     </div>
-
 
     <div class="header-right">
 
@@ -350,7 +436,6 @@ h1 {
             Admin
 
         </button>
-
 
         <button
             class="button logout"
@@ -370,169 +455,200 @@ h1 {
     <h1>📦 Orders</h1>
 
     <p class="subtitle">
-        View and manage student orders.
+        Manage student orders, collect payments and track completed sales.
     </p>
-<!-- ORDER STATISTICS -->
 
-<div class="order-stats">
 
-    <div class="order-stat">
+    <!-- ==========================================
+         STATISTICS
+    =========================================== -->
 
-        <div class="order-stat-title">
-            TOTAL ORDERS
+    <div class="stats">
+
+        <div class="stat">
+            <div class="stat-title">TOTAL ORDERS</div>
+            <div class="stat-number" id="totalOrders">0</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">ORDERED</div>
+            <div class="stat-number" id="orderedOrders">0</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">ACCEPTED</div>
+            <div class="stat-number" id="acceptedOrders">0</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">COLLECTED</div>
+            <div class="stat-number" id="collectedOrders">0</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">REJECTED</div>
+            <div class="stat-number" id="rejectedOrders">0</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">ACCEPTED ITEMS</div>
+            <div class="stat-number" id="acceptedItems">0</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">COLLECTED ITEMS</div>
+            <div class="stat-number" id="collectedItems">0</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">FINISHED ITEMS</div>
+            <div class="stat-number" id="finishedItems">0</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">TOTAL SALES</div>
+            <div class="stat-number" id="totalSales">₹0.00</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">TO COLLECT</div>
+            <div class="stat-number" id="pendingValue">₹0.00</div>
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         FILTERS
+    =========================================== -->
+
+    <div class="order-filters">
+
+        <input
+            type="text"
+            id="orderSearch"
+            placeholder="🔍 Search by student email or Order ID">
+
+        <select id="statusFilter">
+
+            <option value="all">
+                All Orders
+            </option>
+
+            <option value="pending">
+                Pending
+            </option>
+
+            <option value="accepted">
+                Accepted
+            </option>
+
+            <option value="collected">
+                Collected
+            </option>
+
+            <option value="rejected">
+                Rejected
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- ==========================================
+         ORDERED SECTION
+    =========================================== -->
+
+    <section class="order-section">
+
+        <div class="section-header">
+
+            <div>
+                <h2 class="section-title">
+                    🛒 Ordered
+                </h2>
+
+                <p class="section-description">
+                    Pending and accepted orders waiting for the student to come to the store and pay.
+                </p>
+            </div>
+
+            <div
+                class="section-count"
+                id="orderedSectionCount">
+
+                0 orders
+
+            </div>
+
         </div>
 
         <div
-            class="order-stat-number"
-            id="totalOrders">
-            0
+            id="orderedContainer"
+            class="orders">
+
+            <div class="loading">
+                Loading orders...
+            </div>
+
         </div>
 
-    </div>
+    </section>
 
 
-    <div class="order-stat">
+    <!-- ==========================================
+         COLLECTED SECTION
+    =========================================== -->
 
-        <div class="order-stat-title">
-            PENDING
-        </div>
+    <section class="order-section">
 
-        <div
-            class="order-stat-number"
-            id="pendingOrders">
-            0
-        </div>
+        <div class="section-header">
 
-    </div>
+            <div>
+                <h2 class="section-title">
+                    💰 Collected
+                </h2>
 
+                <p class="section-description">
+                    Orders where the student has paid and collected the products.
+                </p>
+            </div>
 
-    <div class="order-stat">
+            <div
+                class="section-count"
+                id="collectedSectionCount">
 
-        <div class="order-stat-title">
-            ACCEPTED
-        </div>
+                0 orders
 
-        <div
-            class="order-stat-number"
-            id="acceptedOrders">
-            0
-        </div>
+            </div>
 
-    </div>
-
-
-    <div class="order-stat">
-
-        <div class="order-stat-title">
-            REJECTED
         </div>
 
         <div
-            class="order-stat-number"
-            id="rejectedOrders">
-            0
+            id="collectedContainer"
+            class="orders">
+
+            <div class="loading">
+                Loading collected orders...
+            </div>
+
         </div>
 
-    </div>
-<div class="order-stat">
-
-    <div class="order-stat-title">
-        TOTAL SALES
-    </div>
-
-    <div
-        class="order-stat-number"
-        id="totalSales">
-        ₹0
-    </div>
-
-</div>
-
-
-<div class="order-stat">
-
-    <div class="order-stat-title">
-        ITEMS SOLD
-    </div>
-
-    <div
-        class="order-stat-number"
-        id="itemsSold">
-        0
-    </div>
-
-</div>
-
-
-<div class="order-stat">
-
-    <div class="order-stat-title">
-        PENDING VALUE
-    </div>
-
-    <div
-        class="order-stat-number"
-        id="pendingValue">
-        ₹0
-    </div>
-
-</div>
-</div>
-      <!-- ORDER FILTERS -->
-
-<div class="order-filters">
-
-    <input
-        type="text"
-        id="orderSearch"
-        placeholder="🔍 Search by student email or Order ID">
-
-    <select id="statusFilter">
-
-        <option value="all">
-            All Orders
-        </option>
-
-        <option value="pending">
-            Pending
-        </option>
-
-        <option value="accepted">
-            Accepted
-        </option>
-
-        <option value="rejected">
-            Rejected
-        </option>
-
-       <option value="collected">
-    Collected
-       </option>
-          
-    </select>
-
-</div>
-
-    <div
-        id="ordersContainer"
-        class="orders">
-
-        <div class="loading">
-            Loading orders...
-        </div>
-
-    </div>
+    </section>
 
 </main>
 
 
 <script>
 
-      /* ==========================================
-   STORE ORDERS FOR FILTERING
+/* ==========================================
+   GLOBAL DATA
 ========================================== */
 
 let allOrders = [];
+
+
 /* ==========================================
    ADMIN BUTTON
 ========================================== */
@@ -587,7 +703,6 @@ auth.onAuthStateChanged(async function(user) {
 
     console.log("Current user:", user);
 
-
     if (!user) {
 
         window.location.replace("index.html");
@@ -596,7 +711,6 @@ auth.onAuthStateChanged(async function(user) {
 
     }
 
-
     try {
 
         const userDoc =
@@ -604,7 +718,6 @@ auth.onAuthStateChanged(async function(user) {
                 .collection("users")
                 .doc(user.uid)
                 .get();
-
 
         if (!userDoc.exists) {
 
@@ -620,16 +733,8 @@ auth.onAuthStateChanged(async function(user) {
 
         }
 
-
         const userData =
             userDoc.data();
-
-
-        console.log(
-            "User data:",
-            userData
-        );
-
 
         if (userData.role !== "admin") {
 
@@ -645,11 +750,7 @@ auth.onAuthStateChanged(async function(user) {
 
         }
 
-
-        console.log(
-            "ADMIN VERIFIED"
-        );
-
+        console.log("ADMIN VERIFIED");
 
         loadOrders();
 
@@ -662,9 +763,8 @@ auth.onAuthStateChanged(async function(user) {
             error
         );
 
-
         document
-            .getElementById("ordersContainer")
+            .getElementById("orderedContainer")
             .innerHTML = `
 
                 <div class="empty">
@@ -686,24 +786,17 @@ auth.onAuthStateChanged(async function(user) {
 });
 
 
-
 /* ==========================================
    LOAD ORDERS
 ========================================== */
 
 function loadOrders() {
 
-    console.log(
-        "Loading orders..."
-    );
-
+    console.log("Loading orders...");
 
     db
         .collection("orders")
-        .orderBy(
-            "createdAt",
-            "desc"
-        )
+        .orderBy("createdAt", "desc")
         .onSnapshot(
 
             function(snapshot) {
@@ -713,11 +806,7 @@ function loadOrders() {
                     snapshot.size
                 );
 
-
-                /* SAVE ALL ORDERS */
-
                 allOrders = [];
-
 
                 snapshot.forEach(function(doc) {
 
@@ -731,117 +820,11 @@ function loadOrders() {
 
                 });
 
+                updateStatistics();
 
-                /* ==========================================
-                   UPDATE ORDER STATISTICS
-                ========================================== */
-
-                let total = snapshot.size;
-
-let pending = 0;
-
-let accepted = 0;
-
-let rejected = 0;
-
-let totalSales = 0;
-
-let itemsSold = 0;
-
-let pendingValue = 0;
-
-
-                snapshot.forEach(function(doc) {
-
-    const order = doc.data();
-
-    const status =
-        order.status || "pending";
-
-
-    const orderTotal =
-        Number(order.total || 0);
-
-
-    if (status === "pending") {
-
-        pending++;
-
-        pendingValue += orderTotal;
-
-    }
-
-    else if (status === "accepted") {
-
-        accepted++;
-
-        totalSales += orderTotal;
-
-
-        if (Array.isArray(order.items)) {
-
-            order.items.forEach(function(item) {
-
-                itemsSold += Number(
-                    item.quantity || 0
-                );
-
-            });
-
-        }
-
-    }
-
-    else if (status === "rejected") {
-
-        rejected++;
-
-    }
-
-});
-
-
-                document.getElementById(
-                    "totalOrders"
-                ).textContent = total;
-
-
-                document.getElementById(
-                    "pendingOrders"
-                ).textContent = pending;
-
-
-                document.getElementById(
-                    "acceptedOrders"
-                ).textContent = accepted;
-
-
-                document.getElementById(
-                    "rejectedOrders"
-                ).textContent = rejected;
-
-               document.getElementById(
-    "totalSales"
-).textContent =
-    "₹" + totalSales.toFixed(2);
-
-
-document.getElementById(
-    "itemsSold"
-).textContent =
-    itemsSold;
-
-
-document.getElementById(
-    "pendingValue"
-).textContent =
-    "₹" + pendingValue.toFixed(2);
-                /* SHOW FILTERED ORDERS */
-
-                applyOrderFilters();
+                renderOrders();
 
             },
-
 
             function(error) {
 
@@ -850,24 +833,27 @@ document.getElementById(
                     error
                 );
 
+                document
+                    .getElementById("orderedContainer")
+                    .innerHTML = `
 
-                document.getElementById(
-                    "ordersContainer"
-                ).innerHTML = `
+                        <div class="empty">
 
-                    <div class="empty">
+                            ❌ Unable to load orders.
 
-                        ❌ Unable to load orders.
+                            <br><br>
 
-                        <br><br>
+                            ${escapeHTML(
+                                error.message
+                            )}
 
-                        ${escapeHTML(
-                            error.message
-                        )}
+                        </div>
 
-                    </div>
+                    `;
 
-                `;
+                document
+                    .getElementById("collectedContainer")
+                    .innerHTML = "";
 
             }
 
@@ -875,121 +861,180 @@ document.getElementById(
 
 }
 
+
 /* ==========================================
-   APPLY ORDER FILTERS
+   UPDATE STATISTICS
 ========================================== */
 
-function applyOrderFilters() {
+function updateStatistics() {
 
-    const searchInput =
-        document.getElementById(
-            "orderSearch"
-        );
+    let totalOrders = allOrders.length;
 
+    let orderedOrders = 0;
+    let acceptedOrders = 0;
+    let collectedOrders = 0;
+    let rejectedOrders = 0;
 
-    const statusInput =
-        document.getElementById(
-            "statusFilter"
-        );
+    let acceptedItems = 0;
+    let collectedItems = 0;
 
-
-    const search =
-        searchInput.value
-            .trim()
-            .toLowerCase();
+    let totalSales = 0;
+    let pendingValue = 0;
 
 
-    const selectedStatus =
-        statusInput.value;
+    allOrders.forEach(function(orderRecord) {
 
+        const order =
+            orderRecord.data;
 
-    const container =
-        document.getElementById(
-            "ordersContainer"
-        );
+        const status =
+            String(
+                order.status || "pending"
+            ).toLowerCase();
 
-
-    container.innerHTML = "";
-
-
-    let filteredOrders =
-        allOrders.filter(function(orderItem) {
-
-            const id =
-                orderItem.id
-                    .toLowerCase();
-
-
-            const order =
-                orderItem.data;
-
-
-            const email =
-                String(
-                    order.studentEmail || ""
-                )
-                .toLowerCase();
-
-
-            const status =
-                order.status ||
-                "pending";
-
-
-            /* SEARCH */
-
-            const matchesSearch =
-                search === "" ||
-                id.includes(search) ||
-                email.includes(search);
-
-
-            /* STATUS */
-
-            const matchesStatus =
-                selectedStatus === "all" ||
-                status === selectedStatus;
-
-
-            return (
-                matchesSearch &&
-                matchesStatus
+        const total =
+            Number(
+                order.total || 0
             );
 
-        });
+
+        if (
+            status === "pending" ||
+            status === "accepted"
+        ) {
+
+            orderedOrders++;
+
+        }
 
 
-    /* NO RESULTS */
+        if (status === "accepted") {
 
-    if (filteredOrders.length === 0) {
+            acceptedOrders++;
 
-        container.innerHTML = `
+            acceptedItems +=
+                getOrderItemCount(order);
 
-            <div class="empty">
+            pendingValue += total;
 
-                🔍 No matching orders found.
+        }
 
-            </div>
 
-        `;
+        if (status === "collected") {
 
-        return;
+            collectedOrders++;
+
+            collectedItems +=
+                getOrderItemCount(order);
+
+            totalSales += total;
+
+        }
+
+
+        if (status === "rejected") {
+
+            rejectedOrders++;
+
+        }
+
+    });
+
+
+    const finishedItems =
+        acceptedItems +
+        collectedItems;
+
+
+    document.getElementById(
+        "totalOrders"
+    ).textContent =
+        totalOrders;
+
+
+    document.getElementById(
+        "orderedOrders"
+    ).textContent =
+        orderedOrders;
+
+
+    document.getElementById(
+        "acceptedOrders"
+    ).textContent =
+        acceptedOrders;
+
+
+    document.getElementById(
+        "collectedOrders"
+    ).textContent =
+        collectedOrders;
+
+
+    document.getElementById(
+        "rejectedOrders"
+    ).textContent =
+        rejectedOrders;
+
+
+    document.getElementById(
+        "acceptedItems"
+    ).textContent =
+        acceptedItems;
+
+
+    document.getElementById(
+        "collectedItems"
+    ).textContent =
+        collectedItems;
+
+
+    document.getElementById(
+        "finishedItems"
+    ).textContent =
+        finishedItems;
+
+
+    document.getElementById(
+        "totalSales"
+    ).textContent =
+        "₹" + totalSales.toFixed(2);
+
+
+    document.getElementById(
+        "pendingValue"
+    ).textContent =
+        "₹" + pendingValue.toFixed(2);
+
+}
+
+
+/* ==========================================
+   GET TOTAL ITEM QUANTITY
+========================================== */
+
+function getOrderItemCount(order) {
+
+    let count = 0;
+
+    if (!Array.isArray(order.items)) {
+
+        return 0;
 
     }
 
+    order.items.forEach(function(item) {
 
-    /* DISPLAY RESULTS */
-
-    filteredOrders.forEach(function(orderItem) {
-
-        createOrderCard(
-            orderItem.id,
-            orderItem.data
+        count += Number(
+            item.quantity || 0
         );
 
     });
 
+    return count;
+
 }
+
+
 /* ==========================================
    FILTER EVENTS
 ========================================== */
@@ -998,11 +1043,7 @@ document
     .getElementById("orderSearch")
     .addEventListener(
         "input",
-        function() {
-
-            applyOrderFilters();
-
-        }
+        renderOrders
     );
 
 
@@ -1010,40 +1051,203 @@ document
     .getElementById("statusFilter")
     .addEventListener(
         "change",
-        function() {
+        renderOrders
+    );
 
-            applyOrderFilters();
+
+/* ==========================================
+   RENDER ORDERS
+========================================== */
+
+function renderOrders() {
+
+    const orderedContainer =
+        document.getElementById(
+            "orderedContainer"
+        );
+
+    const collectedContainer =
+        document.getElementById(
+            "collectedContainer"
+        );
+
+
+    orderedContainer.innerHTML = "";
+    collectedContainer.innerHTML = "";
+
+
+    const search =
+        document
+            .getElementById("orderSearch")
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const filter =
+        document
+            .getElementById("statusFilter")
+            .value;
+
+
+    let orderedList = [];
+    let collectedList = [];
+
+
+    allOrders.forEach(function(orderRecord) {
+
+        const id =
+            orderRecord.id;
+
+        const order =
+            orderRecord.data;
+
+        const status =
+            String(
+                order.status || "pending"
+            ).toLowerCase();
+
+
+        const searchableText =
+            (
+                id +
+                " " +
+                (order.studentEmail || "")
+            )
+            .toLowerCase();
+
+
+        if (
+            search &&
+            !searchableText.includes(search)
+        ) {
+
+            return;
 
         }
-    );
-      /* ==========================================
+
+
+        if (
+            filter !== "all" &&
+            status !== filter
+        ) {
+
+            return;
+
+        }
+
+
+        if (status === "collected") {
+
+            collectedList.push(orderRecord);
+
+        }
+
+        else {
+
+            orderedList.push(orderRecord);
+
+        }
+
+    });
+
+
+    orderedList.forEach(function(record) {
+
+        createOrderCard(
+            record.id,
+            record.data,
+            orderedContainer
+        );
+
+    });
+
+
+    collectedList.forEach(function(record) {
+
+        createOrderCard(
+            record.id,
+            record.data,
+            collectedContainer
+        );
+
+    });
+
+
+    document.getElementById(
+        "orderedSectionCount"
+    ).textContent =
+        orderedList.length +
+        (
+            orderedList.length === 1
+                ? " order"
+                : " orders"
+        );
+
+
+    document.getElementById(
+        "collectedSectionCount"
+    ).textContent =
+        collectedList.length +
+        (
+            collectedList.length === 1
+                ? " order"
+                : " orders"
+        );
+
+
+    if (orderedList.length === 0) {
+
+        orderedContainer.innerHTML = `
+
+            <div class="empty">
+
+                🛒 No ordered orders found.
+
+            </div>
+
+        `;
+
+    }
+
+
+    if (collectedList.length === 0) {
+
+        collectedContainer.innerHTML = `
+
+            <div class="empty">
+
+                💰 No collected orders found.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* ==========================================
    CREATE ORDER CARD
 ========================================== */
 
 function createOrderCard(
     id,
-    order
+    order,
+    container
 ) {
 
-    const container =
-        document.getElementById(
-            "ordersContainer"
-        );
-
-
     const card =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
-
-    card.className =
-        "order";
+    card.className = "order";
 
 
     const status =
-        order.status ||
-        "pending";
+        String(
+            order.status || "pending"
+        ).toLowerCase();
 
 
     let dateText =
@@ -1066,9 +1270,7 @@ function createOrderCard(
     let itemsHTML = "";
 
 
-    if (
-        Array.isArray(order.items)
-    ) {
+    if (Array.isArray(order.items)) {
 
         order.items.forEach(
             function(item) {
@@ -1135,57 +1337,51 @@ function createOrderCard(
     }
 
 
-let actionsHTML = "";
+    let actionsHTML = "";
 
 
-/* PENDING */
+    if (status === "pending") {
 
-if (status === "pending") {
+        actionsHTML = `
 
-    actionsHTML = `
+            <div class="actions">
 
-        <div class="actions">
+                <button
+                    class="accept"
+                    onclick="changeStatus(
+                        '${id}',
+                        'accepted'
+                    )">
 
-            <button
-                class="accept"
-                onclick="changeStatus(
-                    '${id}',
-                    'accepted'
-                )">
+                    ✓ ACCEPT ORDER
 
-                ✓ ACCEPT ORDER
-
-            </button>
+                </button>
 
 
-            <button
-                class="reject"
-                onclick="changeStatus(
-                    '${id}',
-                    'rejected'
-                )">
+                <button
+                    class="reject"
+                    onclick="changeStatus(
+                        '${id}',
+                        'rejected'
+                    )">
 
-                ✕ REJECT ORDER
+                    ✕ REJECT ORDER
 
-            </button>
+                </button>
 
-        </div>
+            </div>
 
-    `;
+        `;
 
-}
+    }
 
 
-/* ACCEPTED */
+    if (status === "accepted") {
 
-else if (status === "accepted") {
-
-    actionsHTML = `
-
-        <div class="actions">
+        actionsHTML = `
 
             <button
-                class="accept"
+                class="collect"
                 onclick="changeStatus(
                     '${id}',
                     'collected'
@@ -1195,11 +1391,34 @@ else if (status === "accepted") {
 
             </button>
 
-        </div>
+        `;
 
-    `;
+    }
 
-}
+
+    if (status === "collected") {
+
+        actionsHTML = `
+
+            <div
+                style="
+                    margin-top:18px;
+                    padding:11px;
+                    background:#eff6ff;
+                    color:#1d4ed8;
+                    border-radius:8px;
+                    text-align:center;
+                    font-weight:bold;
+                    font-size:13px;
+                ">
+
+                ✓ PAYMENT RECEIVED • PRODUCT COLLECTED
+
+            </div>
+
+        `;
+
+    }
 
 
     card.innerHTML = `
@@ -1225,7 +1444,7 @@ else if (status === "accepted") {
 
                     <br>
 
-                    ${dateText}
+                    ${escapeHTML(dateText)}
 
                 </div>
 
@@ -1284,6 +1503,10 @@ async function changeStatus(
     newStatus
 ) {
 
+    /* ------------------------------------------
+       REJECT ORDER
+    ------------------------------------------ */
+
     if (newStatus === "rejected") {
 
         if (
@@ -1331,11 +1554,14 @@ async function changeStatus(
 
         }
 
-
         return;
 
     }
 
+
+    /* ------------------------------------------
+       ACCEPT ORDER
+    ------------------------------------------ */
 
     if (newStatus === "accepted") {
 
@@ -1368,9 +1594,7 @@ async function changeStatus(
                         );
 
 
-                    if (
-                        !orderSnapshot.exists
-                    ) {
+                    if (!orderSnapshot.exists) {
 
                         throw new Error(
                             "Order does not exist."
@@ -1467,9 +1691,7 @@ async function changeStatus(
                             );
 
 
-                        if (
-                            quantity <= 0
-                        ) {
+                        if (quantity <= 0) {
 
                             throw new Error(
                                 "Invalid quantity for " +
@@ -1548,7 +1770,8 @@ async function changeStatus(
 
             alert(
                 "✅ Order accepted!\n\n" +
-                "Product stock has been reduced."
+                "Stock has been reduced.\n" +
+                "Wait for the student to come and pay."
             );
 
         }
@@ -1568,70 +1791,76 @@ async function changeStatus(
 
         }
 
-    }
-
-      if (newStatus === "collected") {
-
-    if (
-        !confirm(
-            "Confirm that the student has paid offline and collected the products?"
-        )
-    ) {
-
         return;
 
     }
 
 
-    try {
+    /* ------------------------------------------
+       MARK AS COLLECTED
+    ------------------------------------------ */
 
-        await db
-            .collection("orders")
-            .doc(orderId)
-            .update({
+    if (newStatus === "collected") {
 
-                status: "collected",
+        if (
+            !confirm(
+                "Confirm payment received?\n\n" +
+                "The student has paid the money and collected the products."
+            )
+        ) {
 
-                paymentMethod: "offline",
+            return;
 
-                paymentStatus: "paid",
-
-                collectedAt:
-                    firebase.firestore
-                        .FieldValue
-                        .serverTimestamp(),
-
-                updatedAt:
-                    firebase.firestore
-                        .FieldValue
-                        .serverTimestamp()
-
-            });
+        }
 
 
-        alert(
-            "✅ Order marked as collected.\n\n" +
-            "Offline payment received."
-        );
+        try {
+
+            await db
+                .collection("orders")
+                .doc(orderId)
+                .update({
+
+                    status: "collected",
+
+                    collectedAt:
+                        firebase.firestore
+                            .FieldValue
+                            .serverTimestamp(),
+
+                    updatedAt:
+                        firebase.firestore
+                            .FieldValue
+                            .serverTimestamp()
+
+                });
+
+
+            alert(
+                "✅ Payment collected!\n\n" +
+                "Order moved to Collected.\n" +
+                "Sales and collected item count updated."
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Collect order error:",
+                error
+            );
+
+
+            alert(
+                "❌ Unable to mark order as collected:\n\n" +
+                error.message
+            );
+
+        }
 
     }
 
-    catch (error) {
-
-        console.error(
-            "Collection error:",
-            error
-        );
-
-
-        alert(
-            "❌ Unable to mark order as collected:\n\n" +
-            error.message
-        );
-
-    }
-
-      }
 }
 
 
@@ -1674,4 +1903,4 @@ function escapeHTML(value) {
 
 </body>
 
-  </html>
+</html>
