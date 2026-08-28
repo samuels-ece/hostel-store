@@ -336,6 +336,73 @@ h1 {
     width: auto;
 }
 
+/* ==========================================
+   STUDENT-FRIENDLY IMPROVEMENTS
+========================================== */
+
+.store-note {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 15px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.product {
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.product:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 16px rgba(0,0,0,0.06);
+}
+
+.stock-low {
+    color: #b45309 !important;
+}
+
+.cart-hint {
+    color: #667085;
+    font-size: 13px;
+    margin: 5px 0 12px;
+}
+
+.cart-qty {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 7px;
+}
+
+.cart-qty button {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.cart-qty span {
+    min-width: 22px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.checkout-note {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+    color: #667085;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
 @media(max-width:600px) {
 
     .container {
@@ -428,6 +495,11 @@ h1 {
 Choose products and add them to your cart.
 </p>
 
+<div class="store-note">
+    🏪 <strong>How it works:</strong> Place your order here first.
+    Then come to the hostel store, pay the amount offline, and collect your products.
+</div>
+
 
 <div id="message"></div>
 
@@ -510,6 +582,11 @@ Choose products and add them to your cart.
 
     </div>
 
+
+    <div class="checkout-note">
+        💡 Your online order is only a reservation/request.
+        Payment is made at the store when you collect your products.
+    </div>
 
     <button
         id="checkoutButton"
@@ -673,9 +750,22 @@ function loadProducts() {
                 });
 
 
+                // Keep the cart synchronized with the latest stock.
+                cart = cart.filter(function(item) {
+                    const latest = products[item.id];
+                    if (!latest || !latest.available || latest.stock <= 0) {
+                        return false;
+                    }
+                    if (item.quantity > latest.stock) {
+                        item.quantity = latest.stock;
+                    }
+                    return item.quantity > 0;
+                });
+
                 createCategoryOptions();
 
                 displayProducts();
+                updateCart();
 
             },
 
@@ -1006,7 +1096,11 @@ function createProduct(product) {
 
 
         <div
-            class="stock"
+            class="stock ${
+                soldOut
+                ? ''
+                : (product.stock <= 5 ? 'stock-low' : '')
+            }"
             style="${
                 soldOut
                 ? 'color:#dc2626;'
@@ -1015,10 +1109,10 @@ function createProduct(product) {
 
             ${
                 soldOut
-                ? '🔴 0 available'
-                : '🟢 ' +
-                  product.stock +
-                  ' available'
+                ? '🔴 SOLD OUT'
+                : (product.stock <= 5
+                    ? '⚠️ Only ' + product.stock + ' left'
+                    : '🟢 ' + product.stock + ' available')
             }
 
         </div>
@@ -1242,13 +1336,15 @@ function updateCart() {
 
                 <div class="cart-item-details">
 
-                    ₹${item.price.toFixed(2)}
-                    ×
-                    ${item.quantity}
+                    ₹${item.price.toFixed(2)} × ${item.quantity}
+                    = ₹${itemTotal.toFixed(2)}
 
-                    =
-                    ₹${itemTotal.toFixed(2)}
+                </div>
 
+                <div class="cart-qty">
+                    <button onclick="changeCartQuantity(${index}, -1)">−</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="changeCartQuantity(${index}, 1)">+</button>
                 </div>
 
             </div>
@@ -1280,6 +1376,39 @@ function updateCart() {
     ).textContent =
         "₹" + total.toFixed(2);
 
+}
+
+
+/* ==========================================
+   CHANGE CART QUANTITY
+========================================== */
+
+function changeCartQuantity(index, amount) {
+
+    const item = cart[index];
+
+    if (!item) return;
+
+    const product = products[item.id];
+
+    if (!product || !product.available || product.stock <= 0) {
+        cart.splice(index, 1);
+        updateCart();
+        showMessage("⚠️ This product is no longer available.", "error");
+        return;
+    }
+
+    item.quantity += amount;
+
+    if (item.quantity < 1) {
+        cart.splice(index, 1);
+    }
+    else if (item.quantity > product.stock) {
+        item.quantity = product.stock;
+        showMessage("Only " + product.stock + " available.", "error");
+    }
+
+    updateCart();
 }
 
 
@@ -1387,42 +1516,55 @@ document
 
             try {
 
+                // Re-check stock directly from Firestore before placing the order.
+                // This prevents ordering more than what is currently available.
+                const freshItems = [];
                 let total = 0;
 
+                for (const item of cart) {
 
-                cart.forEach(function(item) {
+                    const productRef = db
+                        .collection("products")
+                        .doc(item.id);
 
-                    total +=
-                        item.price *
-                        item.quantity;
+                    const productSnap = await productRef.get();
 
-                });
+                    if (!productSnap.exists) {
+                        throw new Error(item.name + " is no longer available.");
+                    }
 
+                    const latest = productSnap.data();
+                    const latestStock = Number(latest.stock || 0);
+                    const latestAvailable = latest.available === true && latestStock > 0;
 
-                const orderItems =
-                    cart.map(function(item) {
+                    if (!latestAvailable) {
+                        throw new Error(item.name + " is currently sold out.");
+                    }
 
-                        return {
+                    if (item.quantity > latestStock) {
+                        throw new Error(
+                            item.name + " has only " + latestStock +
+                            " available. Please update your cart and try again."
+                        );
+                    }
 
-                            productId:
-                                item.id,
+                    const price = Number(latest.price || item.price || 0);
+                    const quantity = Number(item.quantity || 0);
+                    const subtotal = price * quantity;
 
-                            name:
-                                item.name,
+                    total += subtotal;
 
-                            price:
-                                item.price,
-
-                            quantity:
-                                item.quantity,
-
-                            subtotal:
-                                item.price *
-                                item.quantity
-
-                        };
-
+                    freshItems.push({
+                        productId: item.id,
+                        name: latest.name || item.name,
+                        price: price,
+                        quantity: quantity,
+                        subtotal: subtotal
                     });
+                }
+
+
+                const orderItems = freshItems;
 
 
                 await db
