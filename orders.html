@@ -214,7 +214,43 @@ h1 {
     padding: 40px;
     color: #667085;
 }
+/* ==========================================
+   ORDER STATISTICS
+========================================== */
 
+.order-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 25px 0;
+}
+
+.order-stat {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 18px;
+}
+
+.order-stat-title {
+    font-size: 12px;
+    color: #667085;
+    font-weight: bold;
+}
+
+.order-stat-number {
+    font-size: 26px;
+    font-weight: bold;
+    margin-top: 7px;
+}
+
+@media(max-width:600px) {
+
+    .order-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+}
 @media(max-width:600px) {
 
     .header {
@@ -331,7 +367,71 @@ h1 {
     <p class="subtitle">
         View and manage student orders.
     </p>
-<!-- ORDER FILTERS -->
+<!-- ORDER STATISTICS -->
+
+<div class="order-stats">
+
+    <div class="order-stat">
+
+        <div class="order-stat-title">
+            TOTAL ORDERS
+        </div>
+
+        <div
+            class="order-stat-number"
+            id="totalOrders">
+            0
+        </div>
+
+    </div>
+
+
+    <div class="order-stat">
+
+        <div class="order-stat-title">
+            PENDING
+        </div>
+
+        <div
+            class="order-stat-number"
+            id="pendingOrders">
+            0
+        </div>
+
+    </div>
+
+
+    <div class="order-stat">
+
+        <div class="order-stat-title">
+            ACCEPTED
+        </div>
+
+        <div
+            class="order-stat-number"
+            id="acceptedOrders">
+            0
+        </div>
+
+    </div>
+
+
+    <div class="order-stat">
+
+        <div class="order-stat-title">
+            REJECTED
+        </div>
+
+        <div
+            class="order-stat-number"
+            id="rejectedOrders">
+            0
+        </div>
+
+    </div>
+
+</div>
+      <!-- ORDER FILTERS -->
 
 <div class="order-filters">
 
@@ -564,7 +664,48 @@ function loadOrders() {
 
 
                 container.innerHTML = "";
+/* ==========================================
+   UPDATE ORDER STATISTICS
+========================================== */
 
+let total = snapshot.size;
+let pending = 0;
+let accepted = 0;
+let rejected = 0;
+
+snapshot.forEach(function(doc) {
+
+    const order = doc.data();
+
+    const status =
+        order.status || "pending";
+
+    if (status === "pending") {
+        pending++;
+    }
+
+    else if (status === "accepted") {
+        accepted++;
+    }
+
+    else if (status === "rejected") {
+        rejected++;
+    }
+
+});
+
+
+document.getElementById("totalOrders").textContent =
+    total;
+
+document.getElementById("pendingOrders").textContent =
+    pending;
+
+document.getElementById("acceptedOrders").textContent =
+    accepted;
+
+document.getElementById("rejectedOrders").textContent =
+    rejected;
 
                 if (snapshot.empty) {
 
