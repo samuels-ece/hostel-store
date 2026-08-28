@@ -477,6 +477,11 @@ h1 {
 
 <script>
 
+      /* ==========================================
+   STORE ORDERS FOR FILTERING
+========================================== */
+
+let allOrders = [];
 /* ==========================================
    ADMIN BUTTON
 ========================================== */
@@ -630,6 +635,7 @@ auth.onAuthStateChanged(async function(user) {
 });
 
 
+
 /* ==========================================
    LOAD ORDERS
 ========================================== */
@@ -657,81 +663,89 @@ function loadOrders() {
                 );
 
 
-                const container =
-                    document.getElementById(
-                        "ordersContainer"
-                    );
+                /* SAVE ALL ORDERS */
 
-
-                container.innerHTML = "";
-/* ==========================================
-   UPDATE ORDER STATISTICS
-========================================== */
-
-let total = snapshot.size;
-let pending = 0;
-let accepted = 0;
-let rejected = 0;
-
-snapshot.forEach(function(doc) {
-
-    const order = doc.data();
-
-    const status =
-        order.status || "pending";
-
-    if (status === "pending") {
-        pending++;
-    }
-
-    else if (status === "accepted") {
-        accepted++;
-    }
-
-    else if (status === "rejected") {
-        rejected++;
-    }
-
-});
-
-
-document.getElementById("totalOrders").textContent =
-    total;
-
-document.getElementById("pendingOrders").textContent =
-    pending;
-
-document.getElementById("acceptedOrders").textContent =
-    accepted;
-
-document.getElementById("rejectedOrders").textContent =
-    rejected;
-
-                if (snapshot.empty) {
-
-                    container.innerHTML = `
-
-                        <div class="empty">
-
-                            📦 No orders yet.
-
-                        </div>
-
-                    `;
-
-                    return;
-
-                }
+                allOrders = [];
 
 
                 snapshot.forEach(function(doc) {
 
-                    createOrderCard(
-                        doc.id,
-                        doc.data()
-                    );
+                    allOrders.push({
+
+                        id: doc.id,
+
+                        data: doc.data()
+
+                    });
 
                 });
+
+
+                /* ==========================================
+                   UPDATE ORDER STATISTICS
+                ========================================== */
+
+                let total = snapshot.size;
+
+                let pending = 0;
+
+                let accepted = 0;
+
+                let rejected = 0;
+
+
+                snapshot.forEach(function(doc) {
+
+                    const order = doc.data();
+
+                    const status =
+                        order.status || "pending";
+
+
+                    if (status === "pending") {
+
+                        pending++;
+
+                    }
+
+                    else if (status === "accepted") {
+
+                        accepted++;
+
+                    }
+
+                    else if (status === "rejected") {
+
+                        rejected++;
+
+                    }
+
+                });
+
+
+                document.getElementById(
+                    "totalOrders"
+                ).textContent = total;
+
+
+                document.getElementById(
+                    "pendingOrders"
+                ).textContent = pending;
+
+
+                document.getElementById(
+                    "acceptedOrders"
+                ).textContent = accepted;
+
+
+                document.getElementById(
+                    "rejectedOrders"
+                ).textContent = rejected;
+
+
+                /* SHOW FILTERED ORDERS */
+
+                applyOrderFilters();
 
             },
 
@@ -744,25 +758,23 @@ document.getElementById("rejectedOrders").textContent =
                 );
 
 
-                document
-                    .getElementById(
-                        "ordersContainer"
-                    )
-                    .innerHTML = `
+                document.getElementById(
+                    "ordersContainer"
+                ).innerHTML = `
 
-                        <div class="empty">
+                    <div class="empty">
 
-                            ❌ Unable to load orders.
+                        ❌ Unable to load orders.
 
-                            <br><br>
+                        <br><br>
 
-                            ${escapeHTML(
-                                error.message
-                            )}
+                        ${escapeHTML(
+                            error.message
+                        )}
 
-                        </div>
+                    </div>
 
-                    `;
+                `;
 
             }
 
@@ -770,8 +782,148 @@ document.getElementById("rejectedOrders").textContent =
 
 }
 
-
 /* ==========================================
+   APPLY ORDER FILTERS
+========================================== */
+
+function applyOrderFilters() {
+
+    const searchInput =
+        document.getElementById(
+            "orderSearch"
+        );
+
+
+    const statusInput =
+        document.getElementById(
+            "statusFilter"
+        );
+
+
+    const search =
+        searchInput.value
+            .trim()
+            .toLowerCase();
+
+
+    const selectedStatus =
+        statusInput.value;
+
+
+    const container =
+        document.getElementById(
+            "ordersContainer"
+        );
+
+
+    container.innerHTML = "";
+
+
+    let filteredOrders =
+        allOrders.filter(function(orderItem) {
+
+            const id =
+                orderItem.id
+                    .toLowerCase();
+
+
+            const order =
+                orderItem.data;
+
+
+            const email =
+                String(
+                    order.studentEmail || ""
+                )
+                .toLowerCase();
+
+
+            const status =
+                order.status ||
+                "pending";
+
+
+            /* SEARCH */
+
+            const matchesSearch =
+                search === "" ||
+                id.includes(search) ||
+                email.includes(search);
+
+
+            /* STATUS */
+
+            const matchesStatus =
+                selectedStatus === "all" ||
+                status === selectedStatus;
+
+
+            return (
+                matchesSearch &&
+                matchesStatus
+            );
+
+        });
+
+
+    /* NO RESULTS */
+
+    if (filteredOrders.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                🔍 No matching orders found.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    /* DISPLAY RESULTS */
+
+    filteredOrders.forEach(function(orderItem) {
+
+        createOrderCard(
+            orderItem.id,
+            orderItem.data
+        );
+
+    });
+
+}
+/* ==========================================
+   FILTER EVENTS
+========================================== */
+
+document
+    .getElementById("orderSearch")
+    .addEventListener(
+        "input",
+        function() {
+
+            applyOrderFilters();
+
+        }
+    );
+
+
+document
+    .getElementById("statusFilter")
+    .addEventListener(
+        "change",
+        function() {
+
+            applyOrderFilters();
+
+        }
+    );
+      /* ==========================================
    CREATE ORDER CARD
 ========================================== */
 
