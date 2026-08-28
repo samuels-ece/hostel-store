@@ -663,10 +663,294 @@ function createOrderCard(
    CHANGE STATUS
 ========================================== */
 
-async function changeStatus(
-    orderId,
-    newStatus
-) {
+async function changeStatus(orderId, newStatus) {
+
+    if (newStatus === "rejected") {
+
+        const confirmReject =
+            confirm(
+                "Are you sure you want to reject this order?"
+            );
+
+        if (!confirmReject) {
+            return;
+        }
+
+    }
+
+
+    if (newStatus === "accepted") {
+
+        const confirmAccept =
+            confirm(
+                "Accept this order?\n\n" +
+                "The required product stock will be reduced automatically."
+            );
+
+        if (!confirmAccept) {
+            return;
+        }
+
+    }
+
+
+    try {
+
+        if (newStatus === "rejected") {
+
+            await db
+                .collection("orders")
+                .doc(orderId)
+                .update({
+
+                    status: "rejected",
+
+                    updatedAt:
+                        firebase.firestore
+                            .FieldValue
+                            .serverTimestamp()
+
+                });
+
+
+            alert(
+                "❌ Order rejected."
+            );
+
+            return;
+
+        }
+
+
+        /* =====================================
+           ACCEPT ORDER
+        ===================================== */
+
+        await db.runTransaction(
+            async function(transaction) {
+
+                const orderRef =
+                    db
+                        .collection("orders")
+                        .doc(orderId);
+
+
+                const orderSnapshot =
+                    await transaction.get(
+                        orderRef
+                    );
+
+
+                if (!orderSnapshot.exists) {
+
+                    throw new Error(
+                        "Order does not exist."
+                    );
+
+                }
+
+
+                const order =
+                    orderSnapshot.data();
+
+
+                /* Prevent accepting twice */
+
+                if (
+                    order.status !== "pending"
+                ) {
+
+                    throw new Error(
+                        "This order has already been processed."
+                    );
+
+                }
+
+
+                if (
+                    !Array.isArray(order.items) ||
+                    order.items.length === 0
+                ) {
+
+                    throw new Error(
+                        "This order contains no products."
+                    );
+
+                }
+
+
+                const productRefs = [];
+
+
+                /*
+                 * Read every product first.
+                 */
+
+                for (
+                    const item of order.items
+                ) {
+
+                    if (!item.productId) {
+
+                        throw new Error(
+                            "Product ID is missing for " +
+                            item.name
+                        );
+
+                    }
+
+
+                    const productRef =
+                        db
+                            .collection("products")
+                            .doc(item.productId);
+
+
+                    const productSnapshot =
+                        await transaction.get(
+                            productRef
+                        );
+
+
+                    if (
+                        !productSnapshot.exists
+                    ) {
+
+                        throw new Error(
+                            "Product not found: " +
+                            item.name
+                        );
+
+                    }
+
+
+                    const product =
+                        productSnapshot.data();
+
+
+                    const currentStock =
+                        Number(
+                            product.stock || 0
+                        );
+
+
+                    const quantity =
+                        Number(
+                            item.quantity || 0
+                        );
+
+
+                    if (quantity <= 0) {
+
+                        throw new Error(
+                            "Invalid quantity for " +
+                            item.name
+                        );
+
+                    }
+
+
+                    if (
+                        currentStock < quantity
+                    ) {
+
+                        throw new Error(
+                            "Not enough stock for " +
+                            item.name +
+                            ".\n\n" +
+                            "Available: " +
+                            currentStock +
+                            "\n" +
+                            "Required: " +
+                            quantity
+                        );
+
+                    }
+
+
+                    productRefs.push({
+
+                        ref: productRef,
+
+                        newStock:
+                            currentStock -
+                            quantity
+
+                    });
+
+                }
+
+
+                /*
+                 * Update all product stocks.
+                 */
+
+                productRefs.forEach(
+                    function(product) {
+
+                        transaction.update(
+                            product.ref,
+                            {
+
+                                stock:
+                                    product.newStock,
+
+                                available:
+                                    product.newStock > 0
+
+                            }
+                        );
+
+                    }
+                );
+
+
+                /*
+                 * Finally accept the order.
+                 */
+
+                transaction.update(
+                    orderRef,
+                    {
+
+                        status: "accepted",
+
+                        updatedAt:
+                            firebase.firestore
+                                .FieldValue
+                                .serverTimestamp()
+
+                    }
+                );
+
+            }
+        );
+
+
+        alert(
+            "✅ Order accepted!\n\n" +
+            "Product stock has been reduced automatically."
+        );
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "Order status error:",
+            error
+        );
+
+
+        alert(
+            "❌ Unable to process order.\n\n" +
+            error.message
+        );
+
+    }
+
+                              }
 
     try {
 
