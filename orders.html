@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Hostel Store | Orders</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+<script src="firebase.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+}
+
+.header {
+    background: white;
+    border-bottom: 1px solid #ddd;
+    padding: 15px 20px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #2563eb;
+}
+
+.header-right {
+    display: flex;
+    gap: 8px;
+}
+
+.button {
+    padding: 9px 13px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.logout {
+    color: #dc2626;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 25px 15px 50px;
+}
+
+h1 {
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #667085;
+    margin-top: 0;
+}
+
+.orders {
+    display: grid;
+    gap: 18px;
+    margin-top: 25px;
+}
+
+.order {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.order-number {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.student {
+    color: #667085;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.status {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.accepted {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.items {
+    margin-top: 18px;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.item-name {
+    font-weight: bold;
+}
+
+.item-details {
+    color: #667085;
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+.item-price {
+    font-weight: bold;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.accept {
+    flex: 1;
+    border: none;
+    border-radius: 8px;
+    padding: 11px;
+    background: #16a34a;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.reject {
+    flex: 1;
+    border: none;
+    border-radius: 8px;
+    padding: 11px;
+    background: #dc2626;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.empty {
+    background: white;
+    border: 1px dashed #bbb;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    color: #667085;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #667085;
+}
+
+@media(max-width:600px) {
+
+    .header {
+        padding: 12px;
+    }
+
+    .logo {
+        font-size: 16px;
+    }
+
+    .button {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .order-header {
+        flex-direction: column;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<header class="header">
+
+    <div class="logo">
+        🏪 <span>Hostel Store</span>
+    </div>
+
+
+    <div class="header-right">
+
+        <button
+            class="button"
+            id="adminButton">
+
+            Admin
+
+        </button>
+
+
+        <button
+            class="button logout"
+            id="logoutButton">
+
+            Logout
+
+        </button>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <h1>📦 Orders</h1>
+
+    <p class="subtitle">
+        View and manage student orders.
+    </p>
+
+
+    <div
+        id="ordersContainer"
+        class="orders">
+
+        <div class="loading">
+            Loading orders...
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+/* ==========================================
+   ADMIN BUTTON
+========================================== */
+
+document
+    .getElementById("adminButton")
+    .addEventListener("click", function() {
+
+        window.location.href = "admin.html";
+
+    });
+
+
+/* ==========================================
+   LOGOUT BUTTON
+========================================== */
+
+document
+    .getElementById("logoutButton")
+    .addEventListener("click", async function() {
+
+        try {
+
+            await auth.signOut();
+
+            window.location.replace("index.html");
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Logout error:",
+                error
+            );
+
+            alert(
+                "Logout failed:\n\n" +
+                error.message
+            );
+
+        }
+
+    });
+
+
+/* ==========================================
+   CHECK ADMIN
+========================================== */
+
+auth.onAuthStateChanged(async function(user) {
+
+    console.log("Current user:", user);
+
+
+    if (!user) {
+
+        window.location.replace("index.html");
+
+        return;
+
+    }
+
+
+    try {
+
+        const userDoc =
+            await db
+                .collection("users")
+                .doc(user.uid)
+                .get();
+
+
+        if (!userDoc.exists) {
+
+            alert(
+                "User profile not found."
+            );
+
+            await auth.signOut();
+
+            window.location.replace("index.html");
+
+            return;
+
+        }
+
+
+        const userData =
+            userDoc.data();
+
+
+        console.log(
+            "User data:",
+            userData
+        );
+
+
+        if (userData.role !== "admin") {
+
+            alert(
+                "Access denied. Admin only."
+            );
+
+            await auth.signOut();
+
+            window.location.replace("index.html");
+
+            return;
+
+        }
+
+
+        console.log(
+            "ADMIN VERIFIED"
+        );
+
+
+        loadOrders();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Admin check error:",
+            error
+        );
+
+
+        document
+            .getElementById("ordersContainer")
+            .innerHTML = `
+
+                <div class="empty">
+
+                    ❌ Admin verification failed.
+
+                    <br><br>
+
+                    ${escapeHTML(
+                        error.message
+                    )}
+
+                </div>
+
+            `;
+
+    }
+
+});
+
+
+/* ==========================================
+   LOAD ORDERS
+========================================== */
+
+function loadOrders() {
+
+    console.log(
+        "Loading orders..."
+    );
+
+
+    db
+        .collection("orders")
+        .orderBy(
+            "createdAt",
+            "desc"
+        )
+        .onSnapshot(
+
+            function(snapshot) {
+
+                console.log(
+                    "Orders received:",
+                    snapshot.size
+                );
+
+
+                const container =
+                    document.getElementById(
+                        "ordersContainer"
+                    );
+
+
+                container.innerHTML = "";
+
+
+                if (snapshot.empty) {
+
+                    container.innerHTML = `
+
+                        <div class="empty">
+
+                            📦 No orders yet.
+
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                snapshot.forEach(function(doc) {
+
+                    createOrderCard(
+                        doc.id,
+                        doc.data()
+                    );
+
+                });
+
+            },
+
+
+            function(error) {
+
+                console.error(
+                    "ORDER LOAD ERROR:",
+                    error
+                );
+
+
+                document
+                    .getElementById(
+                        "ordersContainer"
+                    )
+                    .innerHTML = `
+
+                        <div class="empty">
+
+                            ❌ Unable to load orders.
+
+                            <br><br>
+
+                            ${escapeHTML(
+                                error.message
+                            )}
+
+                        </div>
+
+                    `;
+
+            }
+
+        );
+
+}
+
+
+/* ==========================================
+   CREATE ORDER CARD
+========================================== */
+
+function createOrderCard(
+    id,
+    order
+) {
+
+    const container =
+        document.getElementById(
+            "ordersContainer"
+        );
+
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+
+    card.className =
+        "order";
+
+
+    const status =
+        order.status ||
+        "pending";
+
+
+    let dateText =
+        "Date unavailable";
+
+
+    if (
+        order.createdAt &&
+        typeof order.createdAt.toDate === "function"
+    ) {
+
+        dateText =
+            order.createdAt
+                .toDate()
+                .toLocaleString();
+
+    }
+
+
+    let itemsHTML = "";
+
+
+    if (
+        Array.isArray(order.items)
+    ) {
+
+        order.items.forEach(
+            function(item) {
+
+                const price =
+                    Number(
+                        item.price || 0
+                    );
+
+
+                const quantity =
+                    Number(
+                        item.quantity || 0
+                    );
+
+
+                const subtotal =
+                    Number(
+                        item.subtotal ||
+                        price * quantity
+                    );
+
+
+                itemsHTML += `
+
+                    <div class="item">
+
+                        <div>
+
+                            <div class="item-name">
+
+                                ${escapeHTML(
+                                    item.name ||
+                                    "Product"
+                                )}
+
+                            </div>
+
+
+                            <div class="item-details">
+
+                                ₹${price.toFixed(2)}
+                                ×
+                                ${quantity}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="item-price">
+
+                            ₹${subtotal.toFixed(2)}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+    }
+
+
+    let actionsHTML = "";
+
+
+    if (status === "pending") {
+
+        actionsHTML = `
+
+            <div class="actions">
+
+                <button
+                    class="accept"
+                    onclick="changeStatus(
+                        '${id}',
+                        'accepted'
+                    )">
+
+                    ✓ ACCEPT ORDER
+
+                </button>
+
+
+                <button
+                    class="reject"
+                    onclick="changeStatus(
+                        '${id}',
+                        'rejected'
+                    )">
+
+                    ✕ REJECT ORDER
+
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+
+    card.innerHTML = `
+
+        <div class="order-header">
+
+            <div>
+
+                <div class="order-number">
+
+                    Order #${escapeHTML(id)}
+
+                </div>
+
+
+                <div class="student">
+
+                    Student:
+                    ${escapeHTML(
+                        order.studentEmail ||
+                        "Unknown"
+                    )}
+
+                    <br>
+
+                    ${dateText}
+
+                </div>
+
+            </div>
+
+
+            <div class="status ${escapeHTML(status)}">
+
+                ${escapeHTML(status)}
+
+            </div>
+
+        </div>
+
+
+        <div class="items">
+
+            ${itemsHTML}
+
+        </div>
+
+
+        <div class="total">
+
+            <span>
+                Total
+            </span>
+
+            <span>
+
+                ₹${Number(
+                    order.total || 0
+                ).toFixed(2)}
+
+            </span>
+
+        </div>
+
+
+        ${actionsHTML}
+
+    `;
+
+
+    container.appendChild(card);
+
+}
+
+
+/* ==========================================
+   CHANGE ORDER STATUS
+========================================== */
+
+async function changeStatus(
+    orderId,
+    newStatus
+) {
+
+    if (newStatus === "rejected") {
+
+        if (
+            !confirm(
+                "Are you sure you want to reject this order?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        try {
+
+            await db
+                .collection("orders")
+                .doc(orderId)
+                .update({
+
+                    status: "rejected",
+
+                    updatedAt:
+                        firebase.firestore
+                            .FieldValue
+                            .serverTimestamp()
+
+                });
+
+
+            alert(
+                "❌ Order rejected."
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Unable to reject order:\n\n" +
+                error.message
+            );
+
+        }
+
+
+        return;
+
+    }
+
+
+    if (newStatus === "accepted") {
+
+        if (
+            !confirm(
+                "Accept this order?\n\n" +
+                "Product stock will be reduced automatically."
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        try {
+
+            await db.runTransaction(
+                async function(transaction) {
+
+                    const orderRef =
+                        db
+                            .collection("orders")
+                            .doc(orderId);
+
+
+                    const orderSnapshot =
+                        await transaction.get(
+                            orderRef
+                        );
+
+
+                    if (
+                        !orderSnapshot.exists
+                    ) {
+
+                        throw new Error(
+                            "Order does not exist."
+                        );
+
+                    }
+
+
+                    const order =
+                        orderSnapshot.data();
+
+
+                    if (
+                        order.status !== "pending"
+                    ) {
+
+                        throw new Error(
+                            "This order has already been processed."
+                        );
+
+                    }
+
+
+                    if (
+                        !Array.isArray(order.items) ||
+                        order.items.length === 0
+                    ) {
+
+                        throw new Error(
+                            "This order contains no products."
+                        );
+
+                    }
+
+
+                    const updates = [];
+
+
+                    for (
+                        const item of order.items
+                    ) {
+
+                        const productId =
+                            item.productId;
+
+
+                        if (!productId) {
+
+                            throw new Error(
+                                "Product ID missing for " +
+                                item.name
+                            );
+
+                        }
+
+
+                        const productRef =
+                            db
+                                .collection("products")
+                                .doc(productId);
+
+
+                        const productSnapshot =
+                            await transaction.get(
+                                productRef
+                            );
+
+
+                        if (
+                            !productSnapshot.exists
+                        ) {
+
+                            throw new Error(
+                                "Product not found: " +
+                                item.name
+                            );
+
+                        }
+
+
+                        const product =
+                            productSnapshot.data();
+
+
+                        const currentStock =
+                            Number(
+                                product.stock || 0
+                            );
+
+
+                        const quantity =
+                            Number(
+                                item.quantity || 0
+                            );
+
+
+                        if (
+                            quantity <= 0
+                        ) {
+
+                            throw new Error(
+                                "Invalid quantity for " +
+                                item.name
+                            );
+
+                        }
+
+
+                        if (
+                            currentStock < quantity
+                        ) {
+
+                            throw new Error(
+                                "Not enough stock for " +
+                                item.name +
+                                ".\n\nAvailable: " +
+                                currentStock +
+                                "\nRequired: " +
+                                quantity
+                            );
+
+                        }
+
+
+                        updates.push({
+
+                            ref: productRef,
+
+                            stock:
+                                currentStock -
+                                quantity
+
+                        });
+
+                    }
+
+
+                    updates.forEach(
+                        function(item) {
+
+                            transaction.update(
+                                item.ref,
+                                {
+
+                                    stock:
+                                        item.stock,
+
+                                    available:
+                                        item.stock > 0
+
+                                }
+                            );
+
+                        }
+                    );
+
+
+                    transaction.update(
+                        orderRef,
+                        {
+
+                            status: "accepted",
+
+                            updatedAt:
+                                firebase.firestore
+                                    .FieldValue
+                                    .serverTimestamp()
+
+                        }
+                    );
+
+                }
+            );
+
+
+            alert(
+                "✅ Order accepted!\n\n" +
+                "Product stock has been reduced."
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Accept order error:",
+                error
+            );
+
+
+            alert(
+                "❌ Unable to accept order:\n\n" +
+                error.message
+            );
+
+        }
+
+    }
+
+}
+
+
+/* ==========================================
+   ESCAPE HTML
+========================================== */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+</script>
+
+</body>
+
+  </html>
