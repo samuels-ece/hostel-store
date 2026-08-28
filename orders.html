@@ -429,7 +429,49 @@ h1 {
         </div>
 
     </div>
+<div class="order-stat">
 
+    <div class="order-stat-title">
+        TOTAL SALES
+    </div>
+
+    <div
+        class="order-stat-number"
+        id="totalSales">
+        ₹0
+    </div>
+
+</div>
+
+
+<div class="order-stat">
+
+    <div class="order-stat-title">
+        ITEMS SOLD
+    </div>
+
+    <div
+        class="order-stat-number"
+        id="itemsSold">
+        0
+    </div>
+
+</div>
+
+
+<div class="order-stat">
+
+    <div class="order-stat-title">
+        PENDING VALUE
+    </div>
+
+    <div
+        class="order-stat-number"
+        id="pendingValue">
+        ₹0
+    </div>
+
+</div>
 </div>
       <!-- ORDER FILTERS -->
 
@@ -687,40 +729,67 @@ function loadOrders() {
 
                 let total = snapshot.size;
 
-                let pending = 0;
+let pending = 0;
 
-                let accepted = 0;
+let accepted = 0;
 
-                let rejected = 0;
+let rejected = 0;
+
+let totalSales = 0;
+
+let itemsSold = 0;
+
+let pendingValue = 0;
 
 
                 snapshot.forEach(function(doc) {
 
-                    const order = doc.data();
+    const order = doc.data();
 
-                    const status =
-                        order.status || "pending";
+    const status =
+        order.status || "pending";
 
 
-                    if (status === "pending") {
+    const orderTotal =
+        Number(order.total || 0);
 
-                        pending++;
 
-                    }
+    if (status === "pending") {
 
-                    else if (status === "accepted") {
+        pending++;
 
-                        accepted++;
+        pendingValue += orderTotal;
 
-                    }
+    }
 
-                    else if (status === "rejected") {
+    else if (status === "accepted") {
 
-                        rejected++;
+        accepted++;
 
-                    }
+        totalSales += orderTotal;
 
-                });
+
+        if (Array.isArray(order.items)) {
+
+            order.items.forEach(function(item) {
+
+                itemsSold += Number(
+                    item.quantity || 0
+                );
+
+            });
+
+        }
+
+    }
+
+    else if (status === "rejected") {
+
+        rejected++;
+
+    }
+
+});
 
 
                 document.getElementById(
@@ -742,7 +811,22 @@ function loadOrders() {
                     "rejectedOrders"
                 ).textContent = rejected;
 
+               document.getElementById(
+    "totalSales"
+).textContent =
+    "₹" + totalSales.toFixed(2);
 
+
+document.getElementById(
+    "itemsSold"
+).textContent =
+    itemsSold;
+
+
+document.getElementById(
+    "pendingValue"
+).textContent =
+    "₹" + pendingValue.toFixed(2);
                 /* SHOW FILTERED ORDERS */
 
                 applyOrderFilters();
