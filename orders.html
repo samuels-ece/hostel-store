@@ -239,7 +239,53 @@ h1 {
     }
 
 }
+/* ==========================================
+   ORDER FILTERS
+========================================== */
 
+.order-filters {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.order-filters input,
+.order-filters select {
+    padding: 12px 14px;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+}
+
+.order-filters input {
+    flex: 1;
+}
+
+.order-filters select {
+    min-width: 160px;
+}
+
+.order-filters input:focus,
+.order-filters select:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+
+/* MOBILE */
+
+@media(max-width:600px) {
+
+    .order-filters {
+        flex-direction: column;
+    }
+
+    .order-filters select {
+        width: 100%;
+    }
+
+}
 </style>
 
 </head>
@@ -285,7 +331,36 @@ h1 {
     <p class="subtitle">
         View and manage student orders.
     </p>
+<!-- ORDER FILTERS -->
 
+<div class="order-filters">
+
+    <input
+        type="text"
+        id="orderSearch"
+        placeholder="🔍 Search by student email or Order ID">
+
+    <select id="statusFilter">
+
+        <option value="all">
+            All Orders
+        </option>
+
+        <option value="pending">
+            Pending
+        </option>
+
+        <option value="accepted">
+            Accepted
+        </option>
+
+        <option value="rejected">
+            Rejected
+        </option>
+
+    </select>
+
+</div>
 
     <div
         id="ordersContainer"
