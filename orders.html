@@ -10,6 +10,10 @@
 
 <title>Hostel Store | Orders</title>
 
+<!-- PDF report libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -513,6 +517,135 @@ h1 {
 
 }
 
+/* ==========================================
+   REPORTS / PDF DOWNLOAD
+========================================== */
+
+.reports-box {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 18px;
+    margin-top: 25px;
+}
+
+.reports-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.reports-title {
+    margin: 0;
+    font-size: 20px;
+}
+
+.reports-description {
+    color: #667085;
+    font-size: 13px;
+    margin: 5px 0 0;
+    line-height: 1.45;
+}
+
+.report-actions {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 9px;
+}
+
+.report-button {
+    border: 1px solid #d0d5dd;
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 12px 10px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #172033;
+    transition: .15s ease;
+}
+
+.report-button:hover {
+    border-color: #2563eb;
+    background: #eff6ff;
+    transform: translateY(-1px);
+}
+
+.report-button.primary {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+.report-button.primary:hover {
+    background: #1d4ed8;
+}
+
+.report-note {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    background: #f8fafc;
+    color: #475467;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.report-preview {
+    margin-top: 14px;
+    border-top: 1px solid #eee;
+    padding-top: 14px;
+}
+
+.report-preview-title {
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.report-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.report-mini {
+    background: #f8fafc;
+    border-radius: 9px;
+    padding: 10px;
+}
+
+.report-mini-label {
+    color: #667085;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.report-mini-value {
+    font-size: 17px;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+@media(max-width:700px) {
+    .reports-head {
+        flex-direction: column;
+    }
+
+    .report-actions {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .report-button.primary {
+        grid-column: 1 / -1;
+    }
+
+    .report-mini-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
 </style>
 
 </head>
@@ -669,6 +802,66 @@ h1 {
         </div>
 
     </div>
+
+
+
+    <!-- REPORTS -->
+    <section class="reports-box" aria-label="Sales reports">
+        <div class="reports-head">
+            <div>
+                <h2 class="reports-title">📄 Sales & Collection Reports</h2>
+                <p class="reports-description">
+                    Download easy-to-read PDF reports showing products paid & collected and money actually received from students.
+                </p>
+            </div>
+        </div>
+
+        <div class="report-actions">
+            <button class="report-button" onclick="downloadPeriodReport('day')">
+                📅 Day-wise PDF
+            </button>
+            <button class="report-button" onclick="downloadPeriodReport('week')">
+                🗓️ Week-wise PDF
+            </button>
+            <button class="report-button" onclick="downloadPeriodReport('month')">
+                📆 Month-wise PDF
+            </button>
+            <button class="report-button" onclick="downloadPeriodReport('year')">
+                📊 Year-wise PDF
+            </button>
+            <button class="report-button primary" onclick="downloadFullReport()">
+                ⬇️ Full Report PDF
+            </button>
+        </div>
+
+        <div class="report-note">
+            <strong>What is included?</strong> Only orders marked <strong>Collected</strong> are counted as actual sales:
+            number of collected orders, products handed over, and total money received. The full report contains
+            day-wise, week-wise, month-wise and year-wise summaries plus product-wise totals.
+        </div>
+
+        <div class="report-preview">
+            <div class="report-preview-title">Live collected summary</div>
+            <div class="report-mini-grid">
+                <div class="report-mini">
+                    <div class="report-mini-label">COLLECTED ORDERS</div>
+                    <div class="report-mini-value" id="reportCollectedOrders">0</div>
+                </div>
+                <div class="report-mini">
+                    <div class="report-mini-label">PRODUCTS HANDED OVER</div>
+                    <div class="report-mini-value" id="reportCollectedItems">0</div>
+                </div>
+                <div class="report-mini">
+                    <div class="report-mini-label">MONEY RECEIVED</div>
+                    <div class="report-mini-value" id="reportCollectedMoney">₹0.00</div>
+                </div>
+                <div class="report-mini">
+                    <div class="report-mini-label">PRODUCT TYPES</div>
+                    <div class="report-mini-value" id="reportProductTypes">0</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
 
     <!-- PRODUCTS -->
@@ -1156,6 +1349,8 @@ function updateStatistics() {
 
     document.getElementById("pendingValue").textContent =
         "₹" + pendingValue.toFixed(2);
+
+    updateReportPreview();
 
 }
 
@@ -1988,6 +2183,520 @@ async function changeStatus(
 
 }
 
+
+
+/* ==========================================
+   PDF REPORTS
+========================================== */
+
+/*
+ * Report date = collectedAt because the admin marks an order
+ * collected at the moment payment is received and products are
+ * handed over. If an older order has no collectedAt, createdAt
+ * is used as a safe fallback.
+ */
+function getOrderReportDate(order) {
+    const value = order && (order.collectedAt || order.createdAt);
+
+    if (!value) return null;
+
+    try {
+        if (typeof value.toDate === "function") {
+            return value.toDate();
+        }
+
+        if (value instanceof Date) {
+            return value;
+        }
+
+        if (typeof value === "number") {
+            return new Date(value);
+        }
+
+        if (typeof value === "string") {
+            const parsed = new Date(value);
+            return isNaN(parsed.getTime()) ? null : parsed;
+        }
+
+        if (value.seconds) {
+            return new Date(Number(value.seconds) * 1000);
+        }
+    } catch (error) {
+        console.warn("Unable to read report date:", error);
+    }
+
+    return null;
+}
+
+function getCollectedOrders() {
+    return allOrders.filter(function(record) {
+        return String(record.data.status || "").toLowerCase() === "collected";
+    });
+}
+
+function getCollectedItemRows() {
+    const rows = [];
+
+    getCollectedOrders().forEach(function(record) {
+        const order = record.data;
+
+        if (!Array.isArray(order.items)) return;
+
+        order.items.forEach(function(item) {
+            const quantity = Number(item.quantity || 0);
+            const price = Number(item.price || 0);
+            const subtotal = Number(
+                item.subtotal != null ? item.subtotal : price * quantity
+            );
+
+            rows.push({
+                name: item.name || "Product",
+                quantity: quantity,
+                amount: subtotal,
+                orderId: record.id,
+                date: getOrderReportDate(order)
+            });
+        });
+    });
+
+    return rows;
+}
+
+function getReportData() {
+    const collected = getCollectedOrders();
+
+    let totalItems = 0;
+    let totalMoney = 0;
+    const productMap = {};
+
+    collected.forEach(function(record) {
+        const order = record.data;
+        totalItems += getOrderItemCount(order);
+        totalMoney += Number(order.total || 0);
+
+        if (Array.isArray(order.items)) {
+            order.items.forEach(function(item) {
+                const name = String(item.name || "Product");
+                const quantity = Number(item.quantity || 0);
+                const amount = Number(
+                    item.subtotal != null
+                        ? item.subtotal
+                        : Number(item.price || 0) * quantity
+                );
+
+                if (!productMap[name]) {
+                    productMap[name] = {
+                        name: name,
+                        quantity: 0,
+                        amount: 0
+                    };
+                }
+
+                productMap[name].quantity += quantity;
+                productMap[name].amount += amount;
+            });
+        }
+    });
+
+    return {
+        collected: collected,
+        totalItems: totalItems,
+        totalMoney: totalMoney,
+        products: Object.values(productMap).sort(function(a, b) {
+            return b.quantity - a.quantity;
+        })
+    };
+}
+
+function updateReportPreview() {
+    const data = getReportData();
+
+    const ordersEl = document.getElementById("reportCollectedOrders");
+    const itemsEl = document.getElementById("reportCollectedItems");
+    const moneyEl = document.getElementById("reportCollectedMoney");
+    const typesEl = document.getElementById("reportProductTypes");
+
+    if (ordersEl) ordersEl.textContent = data.collected.length;
+    if (itemsEl) itemsEl.textContent = data.totalItems;
+    if (moneyEl) moneyEl.textContent = "₹" + data.totalMoney.toFixed(2);
+    if (typesEl) typesEl.textContent = data.products.length;
+}
+
+function periodKey(date, period) {
+    if (!date) return "Unknown";
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    if (period === "day") {
+        return year + "-" + month + "-" + day;
+    }
+
+    if (period === "month") {
+        return year + "-" + month;
+    }
+
+    if (period === "year") {
+        return String(year);
+    }
+
+    // ISO-like week label, with Monday as the first day.
+    const temp = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const dayOfWeek = temp.getDay() || 7;
+    temp.setDate(temp.getDate() + 4 - dayOfWeek);
+
+    const weekYear = temp.getFullYear();
+    const yearStart = new Date(weekYear, 0, 1);
+    const weekNo = Math.ceil(
+        (((temp - yearStart) / 86400000) + 1) / 7
+    );
+
+    return weekYear + "-W" + String(weekNo).padStart(2, "0");
+}
+
+function groupCollectedOrders(period) {
+    const grouped = {};
+
+    getCollectedOrders().forEach(function(record) {
+        const order = record.data;
+        const date = getOrderReportDate(order);
+        const key = periodKey(date, period);
+
+        if (!grouped[key]) {
+            grouped[key] = {
+                period: key,
+                orders: 0,
+                items: 0,
+                money: 0
+            };
+        }
+
+        grouped[key].orders += 1;
+        grouped[key].items += getOrderItemCount(order);
+        grouped[key].money += Number(order.total || 0);
+    });
+
+    return Object.values(grouped).sort(function(a, b) {
+        return String(b.period).localeCompare(String(a.period));
+    });
+}
+
+function formatPeriodLabel(key, period) {
+    if (key === "Unknown") return "Date unavailable";
+
+    if (period === "day") {
+        const d = new Date(key + "T00:00:00");
+        return d.toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        });
+    }
+
+    if (period === "month") {
+        const d = new Date(key + "-01T00:00:00");
+        return d.toLocaleDateString("en-IN", {
+            month: "long",
+            year: "numeric"
+        });
+    }
+
+    if (period === "year") {
+        return key;
+    }
+
+    return key.replace("-W", " • Week ");
+}
+
+function safeFilePart(value) {
+    return String(value)
+        .replace(/[^a-z0-9]+/gi, "-")
+        .replace(/^-+|-+$/g, "")
+        .toLowerCase();
+}
+
+function ensurePdfLibrary() {
+    if (
+        !window.jspdf ||
+        !window.jspdf.jsPDF ||
+        typeof window.jspdf.jsPDF !== "function"
+    ) {
+        alert(
+            "PDF library could not be loaded.\n\n" +
+            "Please check your internet connection and try again."
+        );
+        return false;
+    }
+
+    return true;
+}
+
+function setupPDF(doc, title, subtitle) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(title, 14, 18);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(90);
+    doc.text(subtitle, 14, 25);
+    doc.text(
+        "Generated: " + new Date().toLocaleString("en-IN"),
+        14,
+        31
+    );
+    doc.setTextColor(0);
+}
+
+function addSummaryCards(doc, data, startY) {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const gap = 4;
+    const cardWidth = (pageWidth - 28 - gap * 3) / 4;
+    const labels = [
+        "Collected Orders",
+        "Products Handed Over",
+        "Money Received",
+        "Product Types"
+    ];
+    const values = [
+        String(data.collected.length),
+        String(data.totalItems),
+        "₹" + data.totalMoney.toFixed(2),
+        String(data.products.length)
+    ];
+
+    labels.forEach(function(label, i) {
+        const x = 14 + i * (cardWidth + gap);
+
+        doc.setDrawColor(220);
+        doc.setFillColor(248, 250, 252);
+        doc.roundedRect(x, startY, cardWidth, 20, 2, 2, "FD");
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7);
+        doc.setTextColor(90);
+        doc.text(label.toUpperCase(), x + 3, startY + 6);
+
+        doc.setFontSize(10);
+        doc.setTextColor(0);
+        doc.text(values[i], x + 3, startY + 14);
+    });
+
+    return startY + 27;
+}
+
+function addSectionTable(doc, title, rows, startY) {
+    let y = startY;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text(title, 14, y);
+    y += 5;
+
+    if (!rows.length) {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(100);
+        doc.text("No collected sales found for this period.", 14, y + 5);
+        doc.setTextColor(0);
+        return y + 15;
+    }
+
+    doc.autoTable({
+        startY: y,
+        head: [["Period", "Orders", "Products", "Amount Received"]],
+        body: rows.map(function(row) {
+            return [
+                row.label,
+                String(row.orders),
+                String(row.items),
+                "₹" + row.money.toFixed(2)
+            ];
+        }),
+        theme: "grid",
+        styles: {
+            font: "helvetica",
+            fontSize: 8,
+            cellPadding: 3
+        },
+        headStyles: {
+            fontStyle: "bold"
+        },
+        margin: {
+            left: 14,
+            right: 14
+        }
+    });
+
+    return doc.lastAutoTable.finalY + 12;
+}
+
+function addProductTable(doc, products, startY) {
+    let y = startY;
+
+    if (y > 245) {
+        doc.addPage();
+        y = 18;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Product-wise collection", 14, y);
+    y += 5;
+
+    doc.autoTable({
+        startY: y,
+        head: [["Product", "Quantity Collected", "Amount Received"]],
+        body: products.map(function(product) {
+            return [
+                product.name,
+                String(product.quantity),
+                "₹" + product.amount.toFixed(2)
+            ];
+        }),
+        theme: "grid",
+        styles: {
+            font: "helvetica",
+            fontSize: 8,
+            cellPadding: 3
+        },
+        headStyles: {
+            fontStyle: "bold"
+        },
+        margin: {
+            left: 14,
+            right: 14
+        }
+    });
+
+    return doc.lastAutoTable.finalY + 10;
+}
+
+function addFooter(doc) {
+    const pageCount = doc.internal.getNumberOfPages();
+
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        const pageHeight = doc.internal.pageSize.getHeight();
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7);
+        doc.setTextColor(110);
+        doc.text(
+            "Hostel Store • Sales are counted when payment is received and the order is marked Collected.",
+            14,
+            pageHeight - 8
+        );
+        doc.text(
+            "Page " + i + " of " + pageCount,
+            doc.internal.pageSize.getWidth() - 35,
+            pageHeight - 8
+        );
+    }
+
+    doc.setTextColor(0);
+}
+
+function downloadPeriodReport(period) {
+    if (!ensurePdfLibrary()) return;
+
+    const data = getReportData();
+    const grouped = groupCollectedOrders(period);
+
+    const rows = grouped.map(function(row) {
+        return {
+            label: formatPeriodLabel(row.period, period),
+            orders: row.orders,
+            items: row.items,
+            money: row.money
+        };
+    });
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const periodNames = {
+        day: "Day-wise",
+        week: "Week-wise",
+        month: "Month-wise",
+        year: "Year-wise"
+    };
+
+    setupPDF(
+        doc,
+        "Hostel Store - " + periodNames[period] + " Sales Report",
+        "Collected orders only • Payment received + products handed over"
+    );
+
+    let y = addSummaryCards(doc, data, 38);
+    y = addSectionTable(
+        doc,
+        periodNames[period] + " summary",
+        rows,
+        y
+    );
+
+    y = addProductTable(doc, data.products, y);
+
+    addFooter(doc);
+
+    doc.save(
+        "hostel-store-" +
+        safeFilePart(period) +
+        "-sales-report.pdf"
+    );
+}
+
+function downloadFullReport() {
+    if (!ensurePdfLibrary()) return;
+
+    const data = getReportData();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    setupPDF(
+        doc,
+        "Hostel Store - Complete Sales Report",
+        "Day-wise • Week-wise • Month-wise • Year-wise • Collected orders"
+    );
+
+    let y = addSummaryCards(doc, data, 38);
+
+    const periods = [
+        ["Day-wise summary", "day"],
+        ["Week-wise summary", "week"],
+        ["Month-wise summary", "month"],
+        ["Year-wise summary", "year"]
+    ];
+
+    periods.forEach(function(item, index) {
+        const title = item[0];
+        const period = item[1];
+
+        if (index > 0 || y > 245) {
+            doc.addPage();
+            y = 18;
+        }
+
+        const rows = groupCollectedOrders(period).map(function(row) {
+            return {
+                label: formatPeriodLabel(row.period, period),
+                orders: row.orders,
+                items: row.items,
+                money: row.money
+            };
+        });
+
+        y = addSectionTable(doc, title, rows, y);
+    });
+
+    y = addProductTable(doc, data.products, y);
+
+    addFooter(doc);
+
+    doc.save("hostel-store-complete-sales-report.pdf");
+}
 
 /* ==========================================
    ESCAPE HTML
