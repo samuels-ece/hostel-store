@@ -14,196 +14,35 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="firebase.js"></script>
 
 <style>
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fb;
-    color: #172033;
-}
-
-.header {
-    background: white;
-    border-bottom: 1px solid #ddd;
-    padding: 15px 20px;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo {
-    font-size: 19px;
-    font-weight: bold;
-}
-
-.logo span {
-    color: #2563eb;
-}
-
-.buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.button {
-    padding: 9px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: white;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.logout {
-    color: #dc2626;
-}
-
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 25px 15px 50px;
-}
-
-h1 {
-    margin-bottom: 5px;
-}
-
-.subtitle {
-    color: #667085;
-    margin-top: 0;
-}
-
-.orders {
-    display: grid;
-    gap: 18px;
-    margin-top: 25px;
-}
-
-.order {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 14px;
-    padding: 20px;
-}
-
-.order-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 10px;
-}
-
-.order-id {
-    font-weight: bold;
-    font-size: 15px;
-}
-
-.date {
-    color: #667085;
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-.status {
-    padding: 7px 11px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.pending {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.accepted {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.rejected {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.items {
-    margin-top: 18px;
-}
-
-.item {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #eee;
-    padding: 10px 0;
-}
-
-.item-name {
-    font-weight: bold;
-}
-
-.item-details {
-    color: #667085;
-    font-size: 13px;
-    margin-top: 4px;
-}
-
-.item-price {
-    font-weight: bold;
-}
-
-.total {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 17px;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.empty {
-    background: white;
-    border: 1px dashed #bbb;
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
-    color: #667085;
-}
-
-.loading {
-    text-align: center;
-    padding: 40px;
-    color: #667085;
-}
-
-@media(max-width:600px) {
-
-    .header {
-        padding: 12px;
-    }
-
-    .logo {
-        font-size: 15px;
-    }
-
-    .button {
-        padding: 8px;
-        font-size: 11px;
-    }
-
-    .order-header {
-        flex-direction: column;
-    }
-
-}
-
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#f4f7fb;color:#172033}
+.header{background:#fff;border-bottom:1px solid #e5e7eb;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.logo{font-size:19px;font-weight:800}.logo span{color:#2563eb}
+.buttons{display:flex;gap:8px}.button{padding:9px 12px;border:1px solid #dbe1ea;border-radius:9px;background:#fff;cursor:pointer;font-weight:700}.logout{color:#dc2626}
+.container{max-width:1000px;margin:auto;padding:24px 15px 50px}
+h1{margin:0 0 5px;font-size:28px}.subtitle{color:#667085;margin:0 0 20px}
+.toolbar{background:#fff;border:1px solid #e1e6ef;border-radius:14px;padding:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.search{flex:1;min-width:210px;padding:11px 12px;border:1px solid #d8dee9;border-radius:9px;font-size:14px}
+select{padding:11px 12px;border:1px solid #d8dee9;border-radius:9px;background:#fff;font-size:14px}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.stat{background:#fff;border:1px solid #e1e6ef;border-radius:12px;padding:14px}.stat b{font-size:20px;display:block}.stat span{color:#667085;font-size:12px}
+.orders{display:grid;gap:16px}.order{background:#fff;border:1px solid #dfe5ee;border-radius:16px;padding:18px;box-shadow:0 2px 8px #00000008}
+.order-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.order-id{font-weight:800;font-size:15px}.date{color:#667085;font-size:12px;margin-top:5px}
+.status{padding:7px 11px;border-radius:20px;font-size:11px;font-weight:800;text-transform:uppercase}
+.pending{background:#fef3c7;color:#92400e}.accepted,.collected,.purchased,.paid{background:#dcfce7;color:#166534}.rejected{background:#fee2e2;color:#991b1b}.cancelled{background:#f3f4f6;color:#4b5563}
+.items{margin-top:15px}.item{display:flex;justify-content:space-between;border-bottom:1px solid #eef1f5;padding:10px 0;gap:10px}.item-name{font-weight:700}.item-details{color:#667085;font-size:13px;margin-top:4px}.item-price{font-weight:800}
+.total{display:flex;justify-content:space-between;margin-top:15px;font-size:18px;font-weight:800}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.action{border:1px solid #d8dee9;background:#fff;border-radius:9px;padding:9px 12px;font-weight:700;cursor:pointer}.primary{background:#2563eb;color:#fff;border-color:#2563eb}
+.empty,.loading{background:#fff;border:1px dashed #b9c1ce;border-radius:14px;padding:40px;text-align:center;color:#667085}
+.note{font-size:12px;color:#667085;margin-top:10px}
+@media(max-width:700px){.summary{grid-template-columns:repeat(2,1fr)}.order-header{flex-direction:column}h1{font-size:24px}}
+@media(max-width:430px){.summary{grid-template-columns:1fr 1fr}.header{padding:11px}.logo{font-size:15px}.button{padding:8px;font-size:11px}}
+@media print{.header,.toolbar,.actions,.subtitle{display:none!important}.container{max-width:none;padding:0}.order{box-shadow:none;break-inside:avoid}}
 </style>
 
 </head>
@@ -246,393 +85,335 @@ h1 {
 
 
 <main class="container">
+<h1>📦 My Orders</h1>
+<p class="subtitle">Track, filter and download your hostel store purchase history.</p>
 
-    <h1>📦 My Orders</h1>
+<div class="toolbar">
+  <input id="searchBox" class="search" placeholder="🔎 Search order or product..." oninput="applyFilters()">
+  <select id="statusFilter" onchange="applyFilters()">
+    <option value="all">All status</option>
+    <option value="pending">Pending</option>
+    <option value="accepted">Accepted</option>
+    <option value="collected">Collected</option>
+    <option value="purchased">Purchased</option>
+    <option value="paid">Paid</option>
+    <option value="rejected">Rejected</option>
+    <option value="cancelled">Cancelled</option>
+  </select>
+  <button class="action primary" onclick="downloadHistoryPDF()">📄 Download History PDF</button>
+</div>
 
-    <p class="subtitle">
-        Track your hostel store orders.
-    </p>
+<div class="summary">
+  <div class="stat"><b id="statOrders">0</b><span>Total Orders</span></div>
+  <div class="stat"><b id="statAccepted">0</b><span>Accepted / Collected</span></div>
+  <div class="stat"><b id="statPurchased">0</b><span>Purchased</span></div>
+  <div class="stat"><b id="statSpent">₹0</b><span>Total Spent</span></div>
+</div>
 
-
-    <div
-        id="ordersContainer"
-        class="orders">
-
-        <div class="loading">
-            Loading your orders...
-        </div>
-
-    </div>
-
+<div id="ordersContainer" class="orders">
+  <div class="loading">Loading your orders...</div>
+</div>
 </main>
 
 
 <script>
 
 /* ==========================================
-   CHECK LOGIN
+   HOSTEL STORE - MY ORDERS
 ========================================== */
+
+let allOrders = [];
+let currentUser = null;
 
 auth.onAuthStateChanged(function(user) {
-
     if (!user) {
-
-        window.location.replace(
-            "index.html"
-        );
-
+        window.location.replace("index.html");
         return;
-
     }
-
-
+    currentUser = user;
     loadMyOrders(user.uid);
-
 });
 
-
-/* ==========================================
-   LOAD STUDENT ORDERS
-========================================== */
-
 function loadMyOrders(userId) {
+    db.collection("orders")
+      .where("studentId", "==", userId)
+      .onSnapshot(function(snapshot) {
+          allOrders = [];
+          snapshot.forEach(function(doc) {
+              allOrders.push({ id: doc.id, data: doc.data() });
+          });
 
-    db
-        .collection("orders")
-        .where(
-            "studentId",
-            "==",
-            userId
-        )
-        .onSnapshot(
+          allOrders.sort(function(a,b) {
+              return getTime(b.data.createdAt) - getTime(a.data.createdAt);
+          });
 
-            function(snapshot) {
-
-                const container =
-                    document.getElementById(
-                        "ordersContainer"
-                    );
-
-
-                container.innerHTML = "";
-
-
-                if (snapshot.empty) {
-
-                    container.innerHTML = `
-
-                        <div class="empty">
-
-                            📦
-
-                            <br><br>
-
-                            You haven't placed
-                            any orders yet.
-
-                            <br><br>
-
-                            Go to the store
-                            and place your first order.
-
-                        </div>
-
-                    `;
-
-                    return;
-
-                }
-
-
-                const orders = [];
-
-
-                snapshot.forEach(function(doc) {
-
-                    orders.push({
-
-                        id: doc.id,
-
-                        data: doc.data()
-
-                    });
-
-                });
-
-
-                orders.sort(function(a, b) {
-
-                    const timeA =
-                        a.data.createdAt
-                            ? a.data.createdAt.seconds
-                            : 0;
-
-                    const timeB =
-                        b.data.createdAt
-                            ? b.data.createdAt.seconds
-                            : 0;
-
-                    return timeB - timeA;
-
-                });
-
-
-                orders.forEach(function(order) {
-
-                    createOrderCard(
-                        order.id,
-                        order.data
-                    );
-
-                });
-
-            },
-
-            function(error) {
-
-                console.error(error);
-
-
-                document
-                    .getElementById(
-                        "ordersContainer"
-                    )
-                    .innerHTML = `
-
-                    <div class="empty">
-
-                        Unable to load orders.
-
-                        <br><br>
-
-                        ${escapeHTML(
-                            error.message
-                        )}
-
-                    </div>
-
-                    `;
-
-            }
-
-        );
-
+          updateStats();
+          applyFilters();
+      }, function(error) {
+          console.error(error);
+          document.getElementById("ordersContainer").innerHTML =
+            '<div class="empty">Unable to load orders.<br><br>' +
+            escapeHTML(error.message) + '</div>';
+      });
 }
 
+function getTime(value) {
+    if (!value) return 0;
+    if (typeof value.toMillis === "function") return value.toMillis();
+    if (value.seconds) return value.seconds * 1000;
+    return new Date(value).getTime() || 0;
+}
 
-/* ==========================================
-   CREATE ORDER CARD
-========================================== */
+function getStatus(order) {
+    return String(order.status || "pending").toLowerCase();
+}
 
-function createOrderCard(
-    id,
-    order
-) {
+function updateStats() {
+    const accepted = allOrders.filter(x =>
+        ["accepted","collected"].includes(getStatus(x.data))
+    ).length;
+    const purchased = allOrders.filter(x =>
+        ["purchased","paid","collected"].includes(getStatus(x.data))
+    ).length;
+    const spent = allOrders.reduce((sum,x) => {
+        const s = getStatus(x.data);
+        return ["purchased","paid","collected"].includes(s)
+          ? sum + Number(x.data.total || 0) : sum;
+    },0);
 
-    const container =
-        document.getElementById(
-            "ordersContainer"
-        );
+    document.getElementById("statOrders").textContent = allOrders.length;
+    document.getElementById("statAccepted").textContent = accepted;
+    document.getElementById("statPurchased").textContent = purchased;
+    document.getElementById("statSpent").textContent = "₹" + spent.toFixed(2);
+}
 
+function applyFilters() {
+    const q = document.getElementById("searchBox").value.toLowerCase().trim();
+    const status = document.getElementById("statusFilter").value;
+    const filtered = allOrders.filter(function(x) {
+        const o = x.data;
+        const statusOK = status === "all" || getStatus(o) === status;
+        const haystack = [
+            x.id,
+            o.status,
+            ...(Array.isArray(o.items) ? o.items.map(i => i.name || "") : [])
+        ].join(" ").toLowerCase();
+        return statusOK && (!q || haystack.includes(q));
+    });
 
-    const card =
-        document.createElement("div");
+    renderOrders(filtered);
+}
 
+function renderOrders(orders) {
+    const container = document.getElementById("ordersContainer");
+    container.innerHTML = "";
 
+    if (!orders.length) {
+        container.innerHTML = '<div class="empty">📦<br><br>No matching orders found.<br>Try another filter or search.</div>';
+        return;
+    }
+
+    orders.forEach(function(order) {
+        createOrderCard(order.id, order.data);
+    });
+}
+
+function createOrderCard(id, order) {
+    const container = document.getElementById("ordersContainer");
+    const card = document.createElement("div");
     card.className = "order";
 
-
-    const status =
-        order.status || "pending";
-
-
-    let dateText =
-        "Date unavailable";
-
-
-    if (order.createdAt) {
-
-        dateText =
-            order.createdAt
-                .toDate()
-                .toLocaleString();
-
-    }
-
+    const status = getStatus(order);
+    const dateText = order.createdAt && typeof order.createdAt.toDate === "function"
+        ? order.createdAt.toDate().toLocaleString()
+        : order.createdAt ? new Date(order.createdAt).toLocaleString() : "Date unavailable";
 
     let itemsHTML = "";
-
-
     if (Array.isArray(order.items)) {
-
         order.items.forEach(function(item) {
-
-            const price =
-                Number(
-                    item.price || 0
-                );
-
-
-            const quantity =
-                Number(
-                    item.quantity || 0
-                );
-
-
-            const subtotal =
-                Number(
-                    item.subtotal ||
-                    price * quantity
-                );
-
-
+            const price = Number(item.price || 0);
+            const quantity = Number(item.quantity || 0);
+            const subtotal = Number(item.subtotal || price * quantity);
             itemsHTML += `
-
-                <div class="item">
-
-                    <div>
-
-                        <div class="item-name">
-
-                            ${escapeHTML(
-                                item.name || "Product"
-                            )}
-
-                        </div>
-
-
-                        <div class="item-details">
-
-                            ₹${price.toFixed(2)}
-
-                            ×
-
-                            ${quantity}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="item-price">
-
-                        ₹${subtotal.toFixed(2)}
-
-                    </div>
-
+              <div class="item">
+                <div>
+                  <div class="item-name">${escapeHTML(item.name || "Product")}</div>
+                  <div class="item-details">₹${price.toFixed(2)} × ${quantity}</div>
                 </div>
-
-            `;
-
+                <div class="item-price">₹${subtotal.toFixed(2)}</div>
+              </div>`;
         });
-
     }
 
-
     card.innerHTML = `
-
-        <div class="order-header">
-
-            <div>
-
-                <div class="order-id">
-
-                    Order #${escapeHTML(id)}
-
-                </div>
-
-
-                <div class="date">
-
-                    ${dateText}
-
-                </div>
-
-            </div>
-
-
-            <div class="status ${status}">
-
-                ${status}
-
-            </div>
-
+      <div class="order-header">
+        <div>
+          <div class="order-id">Order #${escapeHTML(id)}</div>
+          <div class="date">${escapeHTML(dateText)}</div>
         </div>
-
-
-        <div class="items">
-
-            ${itemsHTML}
-
-        </div>
-
-
-        <div class="total">
-
-            <span>Total</span>
-
-            <span>
-
-                ₹${Number(
-                    order.total || 0
-                ).toFixed(2)}
-
-            </span>
-
-        </div>
-
+        <div class="status ${escapeHTML(status)}">${escapeHTML(status)}</div>
+      </div>
+      <div class="items">${itemsHTML || '<div class="item-details">No item details available.</div>'}</div>
+      <div class="total"><span>Total</span><span>₹${Number(order.total || 0).toFixed(2)}</span></div>
+      <div class="actions">
+        <button class="action primary" onclick='downloadReceipt(${JSON.stringify(id)}, ${JSON.stringify(order)})'>🧾 Download Receipt</button>
+        <button class="action" onclick='printReceipt(${JSON.stringify(id)}, ${JSON.stringify(order)})'>🖨️ Print</button>
+      </div>
+      <div class="note">Receipt is available for your offline purchase record. Keep it for reference.</div>
     `;
 
-
     container.appendChild(card);
-
 }
 
+function downloadHistoryPDF() {
+    if (!allOrders.length) {
+        alert("No order history to download.");
+        return;
+    }
+    if (!window.jspdf) {
+        alert("PDF library could not be loaded. Please check your internet connection.");
+        return;
+    }
 
-/* ==========================================
-   STORE BUTTON
-========================================== */
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 18;
+
+    doc.setFontSize(18);
+    doc.text("Hostel Store - Purchase History", 14, y);
+    y += 8;
+    doc.setFontSize(10);
+    doc.text("Student: " + (currentUser?.email || "Student"), 14, y);
+    y += 7;
+    doc.text("Generated: " + new Date().toLocaleString(), 14, y);
+    y += 10;
+
+    allOrders.forEach(function(x, index) {
+        const o = x.data;
+        if (y > 270) { doc.addPage(); y = 18; }
+
+        doc.setFontSize(12);
+        doc.text("Order #" + x.id, 14, y);
+        y += 6;
+        doc.setFontSize(9);
+        doc.text("Date: " + formatDate(o.createdAt) + " | Status: " + getStatus(o), 14, y);
+        y += 6;
+
+        if (Array.isArray(o.items)) {
+            o.items.forEach(function(item) {
+                const line = (item.name || "Product") + "  x" +
+                    Number(item.quantity || 0) + "  -  Rs." +
+                    Number(item.subtotal || (item.price || 0) * (item.quantity || 0)).toFixed(2);
+                const lines = doc.splitTextToSize(line, 180);
+                doc.text(lines, 18, y);
+                y += 5 * lines.length;
+            });
+        }
+
+        doc.setFontSize(10);
+        doc.text("Total: Rs." + Number(o.total || 0).toFixed(2), 18, y);
+        y += 9;
+
+        if (index < allOrders.length - 1) {
+            doc.line(14, y, 196, y);
+            y += 6;
+        }
+    });
+
+    doc.save("hostel-store-purchase-history.pdf");
+}
+
+function downloadReceipt(id, order) {
+    if (!window.jspdf) {
+        alert("PDF library could not be loaded. Please check your internet connection.");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 20;
+
+    doc.setFontSize(20);
+    doc.text("HOSTEL STORE", 105, y, {align:"center"});
+    y += 10;
+    doc.setFontSize(13);
+    doc.text("OFFLINE PURCHASE RECEIPT", 105, y, {align:"center"});
+    y += 12;
+
+    doc.setFontSize(10);
+    doc.text("Receipt / Order ID: " + id, 14, y); y += 6;
+    doc.text("Date: " + formatDate(order.createdAt), 14, y); y += 6;
+    doc.text("Student: " + (currentUser?.email || "Student"), 14, y); y += 9;
+
+    doc.line(14, y, 196, y); y += 8;
+
+    if (Array.isArray(order.items)) {
+        order.items.forEach(function(item) {
+            const name = item.name || "Product";
+            const qty = Number(item.quantity || 0);
+            const sub = Number(item.subtotal || (item.price || 0) * qty);
+            const lines = doc.splitTextToSize(name, 115);
+            doc.text(lines, 14, y);
+            doc.text("x" + qty, 140, y);
+            doc.text("Rs." + sub.toFixed(2), 170, y);
+            y += Math.max(6, 5 * lines.length);
+        });
+    }
+
+    y += 3; doc.line(14, y, 196, y); y += 9;
+    doc.setFontSize(13);
+    doc.text("TOTAL PAID: Rs." + Number(order.total || 0).toFixed(2), 14, y);
+    y += 10;
+    doc.setFontSize(10);
+    doc.text("Payment/Purchase status: " + getStatus(order), 14, y);
+    y += 12;
+    doc.text("Thank you for shopping at Hostel Store.", 105, y, {align:"center"});
+
+    doc.save("hostel-store-receipt-" + safeFilename(id) + ".pdf");
+}
+
+function printReceipt(id, order) {
+    const rows = (Array.isArray(order.items) ? order.items : []).map(item =>
+      `<tr><td>${escapeHTML(item.name || "Product")}</td><td>${Number(item.quantity || 0)}</td><td>₹${Number(item.subtotal || (item.price || 0)*(item.quantity||0)).toFixed(2)}</td></tr>`
+    ).join("");
+
+    const w = window.open("", "_blank");
+    w.document.write(`
+      <html><head><title>Receipt ${escapeHTML(id)}</title>
+      <style>body{font-family:Arial;padding:30px;max-width:650px;margin:auto}table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left}.total{font-size:20px;font-weight:bold;text-align:right;margin-top:20px}</style>
+      </head><body>
+      <h2>HOSTEL STORE</h2><h3>Offline Purchase Receipt</h3>
+      <p>Order: ${escapeHTML(id)}<br>Date: ${escapeHTML(formatDate(order.createdAt))}<br>Student: ${escapeHTML(currentUser?.email || "Student")}</p>
+      <table><tr><th>Product</th><th>Qty</th><th>Amount</th></tr>${rows}</table>
+      <div class="total">Total Paid: ₹${Number(order.total || 0).toFixed(2)}</div>
+      <p>Status: ${escapeHTML(getStatus(order))}</p>
+      <script>window.onload=function(){window.print()}<\/script>
+      </body></html>`);
+    w.document.close();
+}
+
+function formatDate(value) {
+    if (!value) return "Date unavailable";
+    if (typeof value.toDate === "function") return value.toDate().toLocaleString();
+    return new Date(value).toLocaleString();
+}
+
+function safeFilename(value) {
+    return String(value).replace(/[^a-z0-9_-]/gi, "_");
+}
 
 function goStudent() {
-
-    window.location.href =
-        "student.html";
-
+    window.location.href = "student.html";
 }
 
-
-/* ==========================================
-   LOGOUT
-========================================== */
-
-document
-    .getElementById("logoutButton")
-    .addEventListener(
-        "click",
-        async function() {
-
-            try {
-
-                await auth.signOut();
-
-                window.location.replace(
-                    "index.html"
-                );
-
-            }
-
-            catch (error) {
-
-                alert(
-                    "Logout failed:\n\n" +
-                    error.message
-                );
-
-            }
-
-        }
-    );
-
+document.getElementById("logoutButton").addEventListener("click", async function() {
+    try {
+        await auth.signOut();
+        window.location.replace("index.html");
+    } catch (error) {
+        alert("Logout failed:\n\n" + error.message);
+    }
+});
 
 /* ==========================================
    ESCAPE HTML
